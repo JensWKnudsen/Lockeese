@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Lockeese</string>
+    <string name="servicedesc">The key is read by Lock</string>
+    <string name="aiddescription">ID of application for key exchange</string>
 </resources>
