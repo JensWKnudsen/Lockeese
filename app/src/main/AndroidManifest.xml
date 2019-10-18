@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.p3.aaugroup301.lockeese">
     <uses-permission android:name="android.permission.NFC" />
-
     <uses-feature android:name="android.hardware.nfc" android:required="true" />
     <uses-feature android:name="FEATURE_NFC_HOST_CARD_EMULATION" android:required="true"/>
 
