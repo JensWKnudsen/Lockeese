@@ -4,7 +4,11 @@ import android.util.Log;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.List;
 
 import javax.crypto.BadPaddingException;
@@ -21,8 +25,42 @@ import javax.crypto.spec.IvParameterSpec;
 
 
 public class KeyGeneration {
-    private byte[] ciphertext;
-    private byte[] iv;
+
+    public CipherInfo asymmetricEncrypt(byte[] inputText) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+        keyPairGenerator.initialize(1024);
+        KeyPair pair = keyPairGenerator.generateKeyPair();
+        PrivateKey privateKey = pair.getPrivate();
+        PublicKey publicKey = pair.getPublic();
+
+        Cipher cipher;
+
+        cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding"); //ISO10126Padding
+        cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+
+        byte[] ciphertext = cipher.doFinal(inputText);
+
+        CipherInfo cipherInfo = new CipherInfo(ciphertext);
+        cipherInfo.setPrivateKey(privateKey);
+        cipherInfo.setPublicKey(publicKey);
+
+
+        return cipherInfo;
+    }
+
+    public byte[] asymmetricDecrypt(CipherInfo cipherInfo) throws NoSuchAlgorithmException, NoSuchPaddingException,
+            InvalidKeyException, BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException {
+
+        Cipher cipher;
+        cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding"); //ISO10126Padding
+
+        cipher.init(Cipher.DECRYPT_MODE, cipherInfo.getPrivateKey());
+
+        byte[] plaintext = cipher.doFinal(cipherInfo.getBytes());
+
+        return plaintext;
+    }
+
 
     public CipherInfo symmetricEncrypt(byte[] inputText) throws NoSuchAlgorithmException, NoSuchPaddingException,
             InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
@@ -38,18 +76,16 @@ public class KeyGeneration {
         cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING"); //ISO10126Padding
         cipher.init(Cipher.ENCRYPT_MODE, symmetricPhoneKey);
 
-        iv = cipher.getIV();
+        byte[] iv = cipher.getIV();
 
-        Log.d("encrypt", "encrypt IV: " + iv);
+        byte[] ciphertext = cipher.doFinal(inputText);
 
-        ciphertext = cipher.doFinal(inputText);
-
-        CipherInfo cipherInfo = new CipherInfo(symmetricPhoneKey,ciphertext,iv);
+        CipherInfo cipherInfo = new CipherInfo(ciphertext);
+        cipherInfo.setSecretKey(symmetricPhoneKey);
+        cipherInfo.setIv(iv);
 
         return cipherInfo;
     }
-
-    private byte[] plaintext;
 
     public byte[] symmetricDecrypt(byte[] inputText, SecretKey symmetricPhoneKey, byte[] iv) throws NoSuchAlgorithmException, NoSuchPaddingException,
             InvalidKeyException, BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException {
@@ -59,7 +95,7 @@ public class KeyGeneration {
         IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
         cipher.init(Cipher.DECRYPT_MODE, symmetricPhoneKey, ivParameterSpec);
 
-        plaintext = cipher.doFinal(inputText);
+        byte[] plaintext = cipher.doFinal(inputText);
 
         return plaintext;
     }

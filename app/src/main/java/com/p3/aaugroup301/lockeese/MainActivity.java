@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
 
         KeyGeneration keyGeneration = new KeyGeneration();
         try {
-            String plainText = "test";
+            String plainText = "Success!!!";
             byte[] byteText = plainText.getBytes();
 
             Log.d("encrypt", "encrypt plain text: " + plainText);
@@ -46,6 +46,26 @@ public class MainActivity extends AppCompatActivity {
             String decyptedStringText = new String(decryptedText);
 
             Log.d("encrypt", "decrypt cipher text: " + decyptedStringText);
+
+
+
+
+            CipherInfo asymmetricCipherInfo = keyGeneration.asymmetricEncrypt(byteText);
+            byte[] asymmetricCipherText = asymmetricCipherInfo.getBytes();
+
+            Log.d("encrypt", "asymmetricEncrypt cipher text: " + asymmetricCipherText);
+
+            byte[] asymmetricDecryptedBytes = keyGeneration.asymmetricDecrypt(asymmetricCipherInfo);
+
+            Log.d("encrypt", "asymmetricDecrypt cipher byte text: " + asymmetricDecryptedBytes);
+
+            String asymmetricDecyptedStringText = new String(asymmetricDecryptedBytes);
+
+            Log.d("encrypt", "asymmetricDecrypt cipher text: " + asymmetricDecyptedStringText);
+
+
+
+
 
 
         } catch (NoSuchAlgorithmException e) {
