@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+/*
         KeyGeneration keyGeneration = new KeyGeneration();
         try {
             String plainText = "Success!!!";
@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d("encrypt", "encrypt plain text: " + plainText);
             Log.d("encrypt", "encrypt plain byte text: " + byteText);
 
-            CipherInfo cipherInfo = keyGeneration.symmetricEncrypt(byteText);
+           CipherInfo cipherInfo = keyGeneration.symmetricEncrypt(byteText);
             cipherText = cipherInfo.getBytes();
 
             Log.d("encrypt", "encrypt cipher byte text: " + cipherText);
@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
             Log.d("encrypt", "encrypt cipher text: " + cipherStringText);
 
-            byte[] decryptedText = keyGeneration.symmetricDecrypt(cipherText,cipherInfo.getSecretKey(),cipherInfo.getIv());
+           byte[] decryptedText = keyGeneration.symmetricDecrypt(cipherText,cipherInfo.getSecretKey(),cipherInfo.getIv());
 
             Log.d("encrypt", "decrypt cipher byte text: " + decryptedText);
 
@@ -83,5 +83,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
+
+
+ */
     }
 }
