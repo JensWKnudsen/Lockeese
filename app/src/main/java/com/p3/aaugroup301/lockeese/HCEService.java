@@ -7,6 +7,8 @@ import android.os.Bundle;
 public class HCEService extends HostApduService {
     @Override
     public byte[] processCommandApdu(byte[] bytes, Bundle bundle) {
+
+
         // all communication should be encrypted
        //a) get request from NFC reader to send LockKey -> send the LockKey
         // b) LockKey is wrong -> mess 'the LockKey is incorrect'

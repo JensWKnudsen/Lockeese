@@ -26,12 +26,16 @@ import javax.crypto.spec.IvParameterSpec;
 
 public class KeyGeneration {
 
-    public CipherInfo asymmetricEncrypt(byte[] inputText) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+    public KeyPair asymmetricKeyGeneration() throws NoSuchAlgorithmException {
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
         keyPairGenerator.initialize(1024);
-        KeyPair pair = keyPairGenerator.generateKeyPair();
-        PrivateKey privateKey = pair.getPrivate();
-        PublicKey publicKey = pair.getPublic();
+        return keyPairGenerator.generateKeyPair();
+    }
+
+    public CipherInfo asymmetricEncrypt(byte[] inputText, KeyPair keyPair) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+
+        PrivateKey privateKey = keyPair.getPrivate();
+        PublicKey publicKey = keyPair.getPublic();
 
         Cipher cipher;
 
@@ -44,12 +48,11 @@ public class KeyGeneration {
         cipherInfo.setPrivateKey(privateKey);
         cipherInfo.setPublicKey(publicKey);
 
-
         return cipherInfo;
     }
 
     public byte[] asymmetricDecrypt(CipherInfo cipherInfo) throws NoSuchAlgorithmException, NoSuchPaddingException,
-            InvalidKeyException, BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException {
+            InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
 
         Cipher cipher;
         cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding"); //ISO10126Padding
@@ -62,32 +65,43 @@ public class KeyGeneration {
     }
 
 
-    public CipherInfo symmetricEncrypt(byte[] inputText) throws NoSuchAlgorithmException, NoSuchPaddingException,
-            InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
 
+
+
+
+
+
+
+
+
+    public SecretKey symmetricKeyGeneration() throws NoSuchAlgorithmException {
         KeyGenerator keyGenerator;
         keyGenerator = KeyGenerator.getInstance("AES");
         keyGenerator.init(256);
 
-        SecretKey symmetricPhoneKey = keyGenerator.generateKey();
+        return keyGenerator.generateKey();
+    }
+
+    public CipherInfo symmetricEncrypt(byte[] inputText,SecretKey secretKey) throws NoSuchAlgorithmException, NoSuchPaddingException,
+            InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
 
         Cipher cipher;
 
         cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING"); //ISO10126Padding
-        cipher.init(Cipher.ENCRYPT_MODE, symmetricPhoneKey);
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
 
         byte[] iv = cipher.getIV();
 
         byte[] ciphertext = cipher.doFinal(inputText);
 
         CipherInfo cipherInfo = new CipherInfo(ciphertext);
-        cipherInfo.setSecretKey(symmetricPhoneKey);
+        cipherInfo.setSecretKey(secretKey);
         cipherInfo.setIv(iv);
 
         return cipherInfo;
     }
 
-    public byte[] symmetricDecrypt(byte[] inputText, SecretKey symmetricPhoneKey, byte[] iv) throws NoSuchAlgorithmException, NoSuchPaddingException,
+    public byte[] symmetricDecrypt(byte[] inputText, byte[] iv, SecretKey symmetricPhoneKey) throws NoSuchAlgorithmException, NoSuchPaddingException,
             InvalidKeyException, BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException {
 
         Cipher cipher;
