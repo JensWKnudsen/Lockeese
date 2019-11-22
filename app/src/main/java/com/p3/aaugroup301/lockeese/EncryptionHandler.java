@@ -1,7 +1,5 @@
 package com.p3.aaugroup301.lockeese;
 
-import android.util.Log;
-
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
@@ -9,7 +7,6 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.util.List;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -24,7 +21,7 @@ import javax.crypto.spec.IvParameterSpec;
   */
 
 
-public class KeyGeneration {
+public class EncryptionHandler {
 
     public KeyPair asymmetricKeyGeneration() throws NoSuchAlgorithmException {
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
@@ -32,10 +29,22 @@ public class KeyGeneration {
         return keyPairGenerator.generateKeyPair();
     }
 
-    public CipherInfo asymmetricEncrypt(byte[] inputText, KeyPair keyPair) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+    public CipherInfo asymmetricEncrypt(byte[] inputText, PrivateKey privateKey) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
 
-        PrivateKey privateKey = keyPair.getPrivate();
-        PublicKey publicKey = keyPair.getPublic();
+        Cipher cipher;
+
+        cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding"); //ISO10126Padding
+        cipher.init(Cipher.ENCRYPT_MODE, privateKey);
+
+        byte[] ciphertext = cipher.doFinal(inputText);
+
+        CipherInfo cipherInfo = new CipherInfo(ciphertext);
+        cipherInfo.setPrivateKey(privateKey);
+
+        return cipherInfo;
+    }
+
+    public CipherInfo asymmetricEncrypt(byte[] inputText, PublicKey publicKey) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
 
         Cipher cipher;
 
@@ -45,21 +54,33 @@ public class KeyGeneration {
         byte[] ciphertext = cipher.doFinal(inputText);
 
         CipherInfo cipherInfo = new CipherInfo(ciphertext);
-        cipherInfo.setPrivateKey(privateKey);
         cipherInfo.setPublicKey(publicKey);
 
         return cipherInfo;
     }
 
-    public byte[] asymmetricDecrypt(CipherInfo cipherInfo) throws NoSuchAlgorithmException, NoSuchPaddingException,
+    public byte[] asymmetricDecrypt(byte[] bytes, PrivateKey privateKey) throws NoSuchAlgorithmException, NoSuchPaddingException,
             InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
 
         Cipher cipher;
         cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding"); //ISO10126Padding
 
-        cipher.init(Cipher.DECRYPT_MODE, cipherInfo.getPrivateKey());
+        cipher.init(Cipher.DECRYPT_MODE, privateKey);
 
-        byte[] plaintext = cipher.doFinal(cipherInfo.getBytes());
+        byte[] plaintext = cipher.doFinal(bytes);
+
+        return plaintext;
+    }
+
+    public byte[] asymmetricDecrypt(byte[] bytes, PublicKey publicKey) throws NoSuchAlgorithmException, NoSuchPaddingException,
+            InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+
+        Cipher cipher;
+        cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding"); //ISO10126Padding
+
+        cipher.init(Cipher.DECRYPT_MODE, publicKey);
+
+        byte[] plaintext = cipher.doFinal(bytes);
 
         return plaintext;
     }

@@ -7,11 +7,13 @@ import android.util.Log;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -22,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        KeyGeneration keyGeneration = new KeyGeneration();
+        EncryptionHandler keyGeneration = new EncryptionHandler();
         try {
             String plainText = "Success!!!";
             byte[] byteText = plainText.getBytes();
@@ -30,7 +32,8 @@ public class MainActivity extends AppCompatActivity {
             Log.d("encrypt", "encrypt plain text: " + plainText);
             Log.d("encrypt", "encrypt plain byte text: " + byteText);
 
-            CipherInfo cipherInfo = keyGeneration.symmetricEncrypt(byteText);
+            SecretKey secretKey = keyGeneration.symmetricKeyGeneration();
+            CipherInfo cipherInfo = keyGeneration.symmetricEncrypt(byteText,secretKey);
             cipherText = cipherInfo.getBytes();
 
             Log.d("encrypt", "encrypt cipher byte text: " + cipherText);
@@ -39,18 +42,17 @@ public class MainActivity extends AppCompatActivity {
 
             Log.d("encrypt", "encrypt cipher text: " + cipherStringText);
 
-            byte[] decryptedText = keyGeneration.symmetricDecrypt(cipherText,cipherInfo.getSecretKey(),cipherInfo.getIv());
+            byte[] decryptedText = keyGeneration.symmetricDecrypt(cipherText,cipherInfo.getIv(),secretKey);
 
             Log.d("encrypt", "decrypt cipher byte text: " + decryptedText);
 
             String decyptedStringText = new String(decryptedText);
 
-            Log.d("encrypt", "decrypt cipher text: " + decyptedStringText);
+            Log.d("encrypt", "decrypted text: " + decyptedStringText);
 
 
-
-
-            CipherInfo asymmetricCipherInfo = keyGeneration.asymmetricEncrypt(byteText);
+            KeyPair keyPair = keyGeneration.asymmetricKeyGeneration();
+            CipherInfo asymmetricCipherInfo = keyGeneration.asymmetricEncrypt(byteText,keyPair);
             byte[] asymmetricCipherText = asymmetricCipherInfo.getBytes();
 
             Log.d("encrypt", "asymmetricEncrypt cipher text: " + asymmetricCipherText);
