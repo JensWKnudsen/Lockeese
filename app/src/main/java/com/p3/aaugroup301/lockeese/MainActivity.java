@@ -5,15 +5,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
+import java.nio.ByteBuffer;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -26,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
 
         EncryptionHandler keyGeneration = new EncryptionHandler();
         try {
-            String plainText = "Success!!!";
+            String plainText = "request for key";
             byte[] byteText = plainText.getBytes();
 
             Log.d("encrypt", "encrypt plain text: " + plainText);
@@ -52,12 +55,12 @@ public class MainActivity extends AppCompatActivity {
 
 
             KeyPair keyPair = keyGeneration.asymmetricKeyGeneration();
-            CipherInfo asymmetricCipherInfo = keyGeneration.asymmetricEncrypt(byteText,keyPair);
+            CipherInfo asymmetricCipherInfo = keyGeneration.asymmetricEncrypt(byteText,keyPair.getPublic());
             byte[] asymmetricCipherText = asymmetricCipherInfo.getBytes();
 
             Log.d("encrypt", "asymmetricEncrypt cipher text: " + asymmetricCipherText);
 
-            byte[] asymmetricDecryptedBytes = keyGeneration.asymmetricDecrypt(asymmetricCipherInfo);
+            byte[] asymmetricDecryptedBytes = keyGeneration.asymmetricDecrypt(asymmetricCipherInfo.getBytes(),keyPair.getPrivate());
 
             Log.d("encrypt", "asymmetricDecrypt cipher byte text: " + asymmetricDecryptedBytes);
 
@@ -66,7 +69,29 @@ public class MainActivity extends AppCompatActivity {
             Log.d("encrypt", "asymmetricDecrypt cipher text: " + asymmetricDecyptedStringText);
 
 
+            Log.d("encrypt", "test" + Arrays.toString(cipherInfo.getIv()));
 
+            int lengthOfIV = cipherInfo.getIv().length;
+
+
+
+            byte[] lengthOfIVInBytes = ByteBuffer.allocate(8).putInt(lengthOfIV).array();
+
+            Log.d("encrypt", "symmetric encrypted final message iv length: " +  Arrays.toString(lengthOfIVInBytes));
+
+            byte[] messageToApp = new byte[8 + cipherInfo.getIv().length + cipherInfo.getBytes().length];
+
+            System.arraycopy(lengthOfIVInBytes, 0, messageToApp, 0, 8);
+
+            System.arraycopy(cipherInfo.getIv(), 0, messageToApp, 8, cipherInfo.getIv().length);
+
+            Log.d("encrypt", "symmetric encrypted final message iv: " + Arrays.toString(cipherInfo.getIv()));
+
+            System.arraycopy(cipherInfo.getBytes(), 0, messageToApp, 8 + cipherInfo.getIv().length, cipherInfo.getBytes().length);
+
+            Log.d("encrypt", "symmetric encrypted final message byte text: " + Arrays.toString(cipherInfo.getBytes()));
+
+            Log.d("encrypt", "symmetric encrypted final message: " + Arrays.toString(messageToApp));
 
 
 

@@ -1,5 +1,7 @@
 package com.p3.aaugroup301.lockeese;
 
+import android.util.Log;
+
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
@@ -15,6 +17,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 
 /**Class KeyGenerator generates Keys on the phone of the user and encrypts it
  *  with AES 256 encryption
@@ -103,7 +106,7 @@ public class EncryptionHandler {
         return keyGenerator.generateKey();
     }
 
-    public CipherInfo symmetricEncrypt(byte[] inputText,SecretKey secretKey) throws NoSuchAlgorithmException, NoSuchPaddingException,
+    public CipherInfo symmetricEncrypt(byte[] inputText, SecretKey secretKey) throws NoSuchAlgorithmException, NoSuchPaddingException,
             InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
 
         Cipher cipher;
@@ -112,6 +115,10 @@ public class EncryptionHandler {
         cipher.init(Cipher.ENCRYPT_MODE, secretKey);
 
         byte[] iv = cipher.getIV();
+
+        Log.d("encrypt","Length of iv: " + String.valueOf(iv.length));
+        Log.d("encrypt","iv: " + iv);
+
 
         byte[] ciphertext = cipher.doFinal(inputText);
 

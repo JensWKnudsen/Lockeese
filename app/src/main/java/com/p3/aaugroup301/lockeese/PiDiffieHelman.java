@@ -2,6 +2,7 @@ package com.p3.aaugroup301.lockeese;
 
 import android.util.Log;
 
+import java.nio.ByteBuffer;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
@@ -63,6 +64,22 @@ public class PiDiffieHelman {
 
         byte[] piSharedSecret = piKeyAgree.generateSecret();
         SecretKeySpec piAesKeySpec = new SecretKeySpec(piSharedSecret, 0, 16, "AES");
+
+        byte[] requestMessage = "request for key".getBytes();
+
+        CipherInfo requestMessageCipherInfo = encryptionHandler.symmetricEncrypt(requestMessage,piAesKeySpec);
+
+        int lengthOfIV = requestMessageCipherInfo.getIv().length;
+
+        byte[] lengthOfIVInBytes = ByteBuffer.allocate(8).putInt(lengthOfIV).array();
+
+        byte[] messageToApp = new byte[8 + requestMessageCipherInfo.getIv().length + requestMessageCipherInfo.getBytes().length];
+
+        System.arraycopy(lengthOfIVInBytes, 0, messageToApp, 0, 8);
+
+        System.arraycopy(requestMessageCipherInfo.getIv(), 0, messageToApp, 8, requestMessageCipherInfo.getIv().length);
+
+        System.arraycopy(requestMessageCipherInfo.getBytes(), 0, messageToApp, 8 + requestMessageCipherInfo.getIv().length, requestMessageCipherInfo.getBytes().length);
 
 
     }
