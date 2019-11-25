@@ -10,6 +10,7 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 
 import javax.crypto.BadPaddingException;
@@ -26,9 +27,14 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        /*
         EncryptionHandler keyGeneration = new EncryptionHandler();
         try {
+            PiDiffieHelman piDiffieHelman = new PiDiffieHelman();
+            Log.d("encrypt", "Start");
+            piDiffieHelman.piStart();
+
+            /*
             String plainText = "request for key";
             byte[] byteText = plainText.getBytes();
 
@@ -94,7 +100,17 @@ public class MainActivity extends AppCompatActivity {
             Log.d("encrypt", "symmetric encrypted final message: " + Arrays.toString(messageToApp));
 
 
+            byte[] ivLentgh = Arrays.copyOfRange(messageToApp,0,8);
+            Log.d("encrypt", "recived iv length: " + Arrays.toString(ivLentgh));
 
+            byte[] iv = Arrays.copyOfRange(messageToApp,8, 8 + ByteBuffer.wrap(ivLentgh).getInt());
+            Log.d("encrypt", "recived iv: " + Arrays.toString(iv));
+
+            byte[] message = Arrays.copyOfRange(messageToApp,8 + ByteBuffer.wrap(ivLentgh).getInt() ,messageToApp.length);
+            Log.d("encrypt", "recived message: " + Arrays.toString(message));
+            */
+
+        /*
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (NoSuchPaddingException e) {
@@ -107,8 +123,10 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         } catch (InvalidAlgorithmParameterException e) {
             e.printStackTrace();
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
         }
-
+        */
 
     }
 }

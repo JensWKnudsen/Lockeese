@@ -2,6 +2,7 @@ package com.p3.aaugroup301.lockeese;
 
 import android.util.Log;
 
+import java.nio.ByteBuffer;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
@@ -11,6 +12,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Arrays;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -25,6 +27,7 @@ public class AppDiffieHelman {
     KeyPair AsymmetricKeyPairApp;
     EncryptionHandler encryptionHandler;
     PublicKey AsymmetricPublicKeyPi;
+    SecretKeySpec appAesKeySpec;
 
     public PublicKey AppStart(PublicKey AsymmetricPublicKeyPi) throws NoSuchAlgorithmException {
 
@@ -98,7 +101,48 @@ public class AppDiffieHelman {
         Log.d("DH", "App: Execute PHASE1 ...");
         appKeyAgree.doPhase(piDHPubKey, true);
         byte[] piSharedSecret = appKeyAgree.generateSecret();
-        SecretKeySpec appAesKeySpec = new SecretKeySpec(piSharedSecret, 0, 16, "AES");
+        appAesKeySpec = new SecretKeySpec(piSharedSecret, 0, 16, "AES");
     }
+
+    public byte[] readRequestMessage(byte[] fullMessage) throws NoSuchPaddingException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+
+        byte[] ivLentgh = Arrays.copyOfRange(fullMessage,0,8);
+
+        byte[] iv = Arrays.copyOfRange(fullMessage,8, 8 + ByteBuffer.wrap(ivLentgh).getInt());
+
+        byte[] message = Arrays.copyOfRange(fullMessage,8 + ByteBuffer.wrap(ivLentgh).getInt() ,fullMessage.length);
+
+        EncryptionHandler encryptionHandler = new EncryptionHandler();
+        byte[] decryptedMessage = encryptionHandler.symmetricDecrypt(message,iv,appAesKeySpec);
+
+        String stringOfDecryptedMessage = new String(decryptedMessage);
+        if (stringOfDecryptedMessage.equals("request for key")){
+
+            //hash of door key
+            byte[] keyMessage = "Door key".getBytes();
+
+            CipherInfo requestMessageCipherInfo = encryptionHandler.symmetricEncrypt(keyMessage,appAesKeySpec);
+
+            int lengthOfIV = requestMessageCipherInfo.getIv().length;
+
+            byte[] lengthOfIVInBytes = ByteBuffer.allocate(8).putInt(lengthOfIV).array();
+
+            byte[] messageToPi = new byte[8 + requestMessageCipherInfo.getIv().length + requestMessageCipherInfo.getBytes().length];
+
+            System.arraycopy(lengthOfIVInBytes, 0, messageToPi, 0, 8);
+
+            System.arraycopy(requestMessageCipherInfo.getIv(), 0, messageToPi, 8, requestMessageCipherInfo.getIv().length);
+
+            System.arraycopy(requestMessageCipherInfo.getBytes(), 0, messageToPi, 8 + requestMessageCipherInfo.getIv().length, requestMessageCipherInfo.getBytes().length);
+
+            return messageToPi;
+
+        }
+
+        return "Error".getBytes();
+
+    }
+
+
 
 }

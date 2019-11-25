@@ -13,6 +13,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Arrays;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -82,6 +83,22 @@ public class PiDiffieHelman {
         System.arraycopy(requestMessageCipherInfo.getBytes(), 0, messageToApp, 8 + requestMessageCipherInfo.getIv().length, requestMessageCipherInfo.getBytes().length);
 
 
+        // message is sent and response is received
+        byte[] doorKeyMessage = appDiffieHelman.readRequestMessage(messageToApp);
+
+        byte[] ivLength = Arrays.copyOfRange(doorKeyMessage,0,8);
+
+        byte[] iv = Arrays.copyOfRange(doorKeyMessage,8, 8 + ByteBuffer.wrap(ivLength).getInt());
+
+        byte[] message = Arrays.copyOfRange(doorKeyMessage,8 + ByteBuffer.wrap(ivLength).getInt() ,doorKeyMessage.length);
+
+        byte[] decryptedMessage = encryptionHandler.symmetricDecrypt(message,iv,piAesKeySpec);
+
+
+        String stringOfDecryptedMessage = new String(decryptedMessage);
+        Log.d("encrypt", "door key text: " + stringOfDecryptedMessage);
+
+
     }
 
     // Diffi helman part
@@ -91,7 +108,7 @@ public class PiDiffieHelman {
     public KeyPair createDHKeypair() throws NoSuchAlgorithmException {
         Log.d("DH", "PI: Generate DH keypair ...");
         KeyPairGenerator PiKpairGen = KeyPairGenerator.getInstance("DH");
-        PiKpairGen.initialize(2048);
+        PiKpairGen.initialize(512);
         return PiKpairGen.generateKeyPair();
     }
 

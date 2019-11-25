@@ -9,6 +9,7 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.Arrays;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -28,7 +29,7 @@ public class EncryptionHandler {
 
     public KeyPair asymmetricKeyGeneration() throws NoSuchAlgorithmException {
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-        keyPairGenerator.initialize(1024);
+        keyPairGenerator.initialize(2048);
         return keyPairGenerator.generateKeyPair();
     }
 
@@ -36,7 +37,7 @@ public class EncryptionHandler {
 
         Cipher cipher;
 
-        cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding"); //ISO10126Padding
+        cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding"); //ISO10126Padding //PKCS1Padding
         cipher.init(Cipher.ENCRYPT_MODE, privateKey);
 
         byte[] ciphertext = cipher.doFinal(inputText);
@@ -51,11 +52,11 @@ public class EncryptionHandler {
 
         Cipher cipher;
 
-        cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding"); //ISO10126Padding
+        cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding"); //ISO10126Padding //PKCS1Padding
         cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-
+        Log.d("encrypt", "test 1: " + Arrays.toString(inputText));
         byte[] ciphertext = cipher.doFinal(inputText);
-
+        Log.d("encrypt", "test 2");
         CipherInfo cipherInfo = new CipherInfo(ciphertext);
         cipherInfo.setPublicKey(publicKey);
 
