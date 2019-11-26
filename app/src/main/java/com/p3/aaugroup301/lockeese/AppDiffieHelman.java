@@ -39,8 +39,7 @@ public class AppDiffieHelman {
     }
 
     public byte[] appDHKeyExchange(byte[] encryptedMessageFromPi) throws IllegalBlockSizeException, InvalidKeyException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeySpecException, InvalidAlgorithmParameterException {
-        byte[] singleDecryptedMessageFromPi = encryptionHandler.asymmetricDecrypt(encryptedMessageFromPi,AsymmetricPublicKeyPi);
-        byte[] piDHPubKeyEnc = encryptionHandler.asymmetricDecrypt(singleDecryptedMessageFromPi,AsymmetricKeyPairApp.getPrivate());
+        byte[] piDHPubKeyEnc = encryptionHandler.asymmetricDecrypt(encryptedMessageFromPi,AsymmetricKeyPairApp.getPrivate());
         // after the double encryption the message becomes the same as before it was sent
 
         /*
@@ -66,19 +65,17 @@ public class AppDiffieHelman {
         byte[] appDHPubKeyEnc = appDHKeyPair.getPublic().getEncoded();
 
         byte[] encryptedDHPublicKeyOfApp = encryptionHandler.asymmetricEncrypt(appDHPubKeyEnc,AsymmetricPublicKeyPi).getBytes();
-        byte[] doubleEncryptedDHPublicKeyOfApp = encryptionHandler.asymmetricEncrypt(encryptedDHPublicKeyOfApp,AsymmetricKeyPairApp.getPrivate()).getBytes();
 
         //This should happen after the return
         createSharedSecretKey(piDHPubKey,appKeyAgree);
 
-        return doubleEncryptedDHPublicKeyOfApp;
+        return encryptedDHPublicKeyOfApp;
 
 
     }
 
     // The app creates its own DH key pair
     public KeyPair createDHKeypair(DHParameterSpec dhParamFromPisPubKey) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException {
-        Log.d("DH", "PI: Generate DH keypair ...");
         KeyPairGenerator appKpairGen = KeyPairGenerator.getInstance("DH");
         appKpairGen.initialize(dhParamFromPisPubKey);
         return appKpairGen.generateKeyPair();
@@ -86,7 +83,6 @@ public class AppDiffieHelman {
 
     // The app creates and initializes its DH KeyAgreement object
     public KeyAgreement DHKeyAgreement(KeyPair appDHKpair) throws NoSuchAlgorithmException, InvalidKeyException {
-        Log.d("DH", "App: Initialization ...");
         KeyAgreement appKeyAgree = KeyAgreement.getInstance("DH");
         appKeyAgree.init(appDHKpair.getPrivate());
         return appKeyAgree;
@@ -98,7 +94,6 @@ public class AppDiffieHelman {
          * of his version of the DH
          * protocol.
          */
-        Log.d("DH", "App: Execute PHASE1 ...");
         appKeyAgree.doPhase(piDHPubKey, true);
         byte[] piSharedSecret = appKeyAgree.generateSecret();
         appAesKeySpec = new SecretKeySpec(piSharedSecret, 0, 16, "AES");
@@ -119,7 +114,7 @@ public class AppDiffieHelman {
         if (stringOfDecryptedMessage.equals("request for key")){
 
             //hash of door key
-            byte[] keyMessage = "Door key".getBytes();
+            byte[] keyMessage = "Door key, yeah!".getBytes();
 
             CipherInfo requestMessageCipherInfo = encryptionHandler.symmetricEncrypt(keyMessage,appAesKeySpec);
 
@@ -142,7 +137,5 @@ public class AppDiffieHelman {
         return "Error".getBytes();
 
     }
-
-
 
 }

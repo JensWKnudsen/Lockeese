@@ -8,4 +8,6 @@ public class DataBaseHandler {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();//creates an object/reference of the database "db"
 
 
+
+
 }

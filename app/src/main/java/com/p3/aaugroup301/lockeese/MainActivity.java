@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        /*
+
         EncryptionHandler keyGeneration = new EncryptionHandler();
         try {
             PiDiffieHelman piDiffieHelman = new PiDiffieHelman();
@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d("encrypt", "recived message: " + Arrays.toString(message));
             */
 
-        /*
+
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (NoSuchPaddingException e) {
@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (InvalidKeySpecException e) {
             e.printStackTrace();
         }
-        */
+
 
     }
 }

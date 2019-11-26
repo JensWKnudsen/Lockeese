@@ -36,16 +36,14 @@ public class PiDiffieHelman {
 
         KeyPair PiDHKpair = createDHKeypair();
         KeyAgreement piKeyAgree = DHKeyAgreement(PiDHKpair);
-        // Alice encodes her public key, and sends it over to Bob.
+        // Pi encodes its public key, and sends it over to the app.
         byte[] piDHPubKeyEnc = PiDHKpair.getPublic().getEncoded();
 
         byte[] encryptedDHPublicKeyOfPi = encryptionHandler.asymmetricEncrypt(piDHPubKeyEnc,AsymmetricPublicKeyApp).getBytes();
-        byte[] doubleEncryptedDHPublicKeyOfPi = encryptionHandler.asymmetricEncrypt(encryptedDHPublicKeyOfPi,AsymmetricKeyPairPi.getPrivate()).getBytes();
 
-        byte[] doubleEncryptedDHPublicKeyOfApp = appDiffieHelman.appDHKeyExchange(doubleEncryptedDHPublicKeyOfPi);
+        byte[] EncryptedDHPublicKeyOfApp = appDiffieHelman.appDHKeyExchange(encryptedDHPublicKeyOfPi);
 
-        byte[] singleDecryptedMessageFromApp = encryptionHandler.asymmetricDecrypt(doubleEncryptedDHPublicKeyOfApp,AsymmetricPublicKeyApp);
-        byte[] AppDHPubKeyEnc = encryptionHandler.asymmetricDecrypt(singleDecryptedMessageFromApp,AsymmetricKeyPairPi.getPrivate());
+        byte[] AppDHPubKeyEnc = encryptionHandler.asymmetricDecrypt(EncryptedDHPublicKeyOfApp,AsymmetricKeyPairPi.getPrivate());
         // after the double encryption the message becomes the same as before it was sent
 
 
@@ -60,7 +58,6 @@ public class PiDiffieHelman {
         KeyFactory piKeyFac = KeyFactory.getInstance("DH");
         X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(AppDHPubKeyEnc);
         PublicKey AppDHPubKey = piKeyFac.generatePublic(x509KeySpec);
-        System.out.println("PI: Execute PHASE1 ...");
         piKeyAgree.doPhase(AppDHPubKey, true);
 
         byte[] piSharedSecret = piKeyAgree.generateSecret();
@@ -106,7 +103,6 @@ public class PiDiffieHelman {
      * Pi creates its own DH key pair with 2048-bit key size
      */
     public KeyPair createDHKeypair() throws NoSuchAlgorithmException {
-        Log.d("DH", "PI: Generate DH keypair ...");
         KeyPairGenerator PiKpairGen = KeyPairGenerator.getInstance("DH");
         PiKpairGen.initialize(512);
         return PiKpairGen.generateKeyPair();
@@ -114,7 +110,6 @@ public class PiDiffieHelman {
 
     // Pi creates and initializes its DH KeyAgreement object
     public KeyAgreement DHKeyAgreement(KeyPair PiDHKpair) throws NoSuchAlgorithmException, InvalidKeyException {
-        Log.d("DH", "Pi: Initialization ...");
         KeyAgreement PiKeyAgree = KeyAgreement.getInstance("DH");
         PiKeyAgree.init(PiDHKpair.getPrivate());
         return PiKeyAgree;
