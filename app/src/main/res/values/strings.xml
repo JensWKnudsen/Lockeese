@@ -14,8 +14,11 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+    //Strings on ListOfLocksActivity
+    <string name="RecyclerV"> RecyclerViewLOLActivity</string>
+    <string name="buttonGoToKeysActivity"> Go to List of Keys</string>
+    <string name="tvListOfLocksHeader"> LIST OF LOCKS</string>
     <string name="Username"> enter username here</string>
-
-    <!-- Strings for key list screen -->
-    <string name="KeyIconImage">key</string>
+    <string name="tvListOfLocksArray"> LOCKS From DB</string>
+    <string name="spinnerListOfUsersWhoHasAccess"> Look who has access</string>
 </resources>
