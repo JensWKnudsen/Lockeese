@@ -54,8 +54,8 @@ public class ListAdapter extends BaseAdapter {
         }
         final KeysHashes keysHashes = getItem(position);
 
-        keysListViewHolder.keyNameAndUser.setText(keysHashes.KeyName + " (" + keysHashes.UsernameOfGranter + ")");
-        keysListViewHolder.timer.setText("time left " + keysHashes.Timer);
+        keysListViewHolder.keyNameAndUser.setText(keysHashes.KeyName );
+        keysListViewHolder.timer.setText("time left: " + keysHashes.Timer);
         //create updateTimer method
         keysListViewHolder.accessLevel.setText("access level: " + keysHashes.AccessLevel);
         keysListViewHolder.deleteButton.setOnClickListener( new View.OnClickListener() {

@@ -5,6 +5,9 @@ import android.os.CountDownTimer;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
+
+import java.util.Date;
+
 import java.util.ArrayList;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -32,12 +35,22 @@ public class KeysListActivity extends AppCompatActivity  {
 
     public ArrayList<KeysHashes> getKeyHash() {
         ArrayList<KeysHashes>  keysHashesArrayList = new ArrayList<>(  ) ;
-        keysHashesArrayList.add(new KeysHashes("Home key", "Tom",2,134567));
-        keysHashesArrayList.add(new KeysHashes("Office key", "Jerry",3,500000l));
-        keysHashesArrayList.add(new KeysHashes("Summer House key", "John",4,59));
-        keysHashesArrayList.add(new KeysHashes("Summer House key", "Perry",4,59));
-        keysHashesArrayList.add(new KeysHashes("Summer House key", "Perry",4,59));
+        keysHashesArrayList.add(new KeysHashes("0000", "Summer House key (Tom)","sxdchgj",1,345676, "gh"));
+        keysHashesArrayList.add(new KeysHashes("0001", "House (Jerry)","hhgg",3,34576, "gkjhh"));
+        keysHashesArrayList.add(new KeysHashes("0002", "Office (John)","kjihvgf",4,3676, "ghhg"));
+        keysHashesArrayList.add(new KeysHashes("0003", "Garage (Perry)","jhc",2,376, "gjhh"));
+        keysHashesArrayList.add(new KeysHashes("0004", "BF place (Perry)","hgcxcv",2,34567, "gjhgh"));
         return keysHashesArrayList;
+    }
+
+    public String getRemainingTime (int currentUser){
+        long expirationTime = getKeyHash().get( 1 ).Timer;
+        Date expirationDate = new Date(expirationTime);
+        Date currentDate = new Date(  );
+        if (currentDate.after( expirationDate )){
+            //delete key
+        }
+        return expirationDate.toString();
     }
 
 /*
