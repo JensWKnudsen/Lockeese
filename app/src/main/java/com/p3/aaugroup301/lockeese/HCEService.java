@@ -20,5 +20,6 @@ public class HCEService extends HostApduService {
     @Override
     public void onDeactivated(int i) {
 
+
     }
 }
