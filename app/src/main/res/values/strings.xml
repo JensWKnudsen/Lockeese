@@ -19,6 +19,11 @@
     <string name="buttonGoToKeysActivity"> Go to List of Keys</string>
     <string name="tvListOfLocksHeader"> LIST OF LOCKS</string>
     <string name="Username"> enter username here</string>
+    <string name="title_activity_list_of_locks">List_of_locks</string>
     <string name="tvListOfLocksArray"> LOCKS From DB</string>
     <string name="spinnerListOfUsersWhoHasAccess"> Look who has access</string>
+
+    <!-- Strings for key list screen -->
+
+    <string name="KeyIconImage">key</string>
 </resources>

@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -82,7 +83,7 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher, Com
     private void attemptLogin() {
 
         // Store values at the time of the login attempt.
-        String email = usernameView.getText().toString();
+        String username = usernameView.getText().toString();
         String password = passwordView.getText().toString();
 
         boolean cancel = false;
@@ -96,7 +97,7 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher, Com
         }
 
         // Check for a valid email address.
-        if (TextUtils.isEmpty(email)) {
+        if (TextUtils.isEmpty(username)) {
             usernameView.setError(getString(R.string.error_field_required));
             focusView = usernameView;
             cancel = true;
@@ -106,29 +107,30 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher, Com
             // There was an error; don't attempt login and focus the first
             // form field with an error.
             focusView.requestFocus();
- /*
+
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            authTask = new UserLoginTask(email, password, this);
+
+            UserLoginTask authTask = new UserLoginTask(username, password, this);
             if(checkPassword(password)){
                 authTask.execute((Void) null);
             }
         }
-        */
+
         }
-    }
+
 
     public  boolean checkPassword(String password){
         boolean isFine = false;
-        if(password.length() >= 10 && password.matches(".*\\d+.*")) {
+        if(password.length() >= 8 && password.matches(".*\\d+.*")) {
             Log.e("checkP", "lengthOK");
             Log.e("checkP", "number here");
             isFine = true;
         }
 
         else {
-            Toast.makeText(getApplicationContext(), "Password must be at least 10 " +
+            Toast.makeText(getApplicationContext(), "Password must be at least 8 " +
                     "characters long and have a digit", duration).show();
             isFine = false;
         }
@@ -169,14 +171,15 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher, Com
     /**
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
-
-    public static class UserLoginTask extends AsyncTask<Void, Void, String> {
+*/
+    public class UserLoginTask extends AsyncTask<Void, Void, String> {
 
         private  String username;
         private  String password;
         private Context context;
         private ProgressDialog progressDialog;
         private String result;
+        DataBaseHandler dataBaseHandler = new DataBaseHandler();
 
         UserLoginTask(String username, String password, Context context) {
             this.context = context;
@@ -198,11 +201,9 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher, Com
 
             synchronized (this) {
                 try {
-                    Log.e(" trying to login ", "Before controller");
-                    //Calling the register method on the Controller
-                    result = Controller.checkUser(username,password);
-                    Controller.startIPCheck(context);
-                    Controller.startListening(context);
+                    Log.e(" trying to login ", "Before DataBaseHandler");
+                    //Calling the login method on the DataBaseHandler
+                    result = dataBaseHandler.login(username,password);
                     //calling publishProgress method
                     //publishProgress();
                 } catch (Exception e) {
@@ -217,12 +218,13 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher, Com
             if (progressDialog.isShowing()) {
                 progressDialog.setMessage(result);
                 progressDialog.dismiss();
-                if(result.equals("Login successful")){
+                if(!result.equals("")){
                     //Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show();
-                    Controller.goToMainActivity(context);
-                    //  context.startActivity(new Intent(context, MainScreenActivity.class));
+                    //Controller.goToMainActivity(context);
+                      context.startActivity(new Intent(context, KeysListActivity.class));
                 }
-                else {  AlertDialog.Builder login = new AlertDialog.Builder(context);
+                else { AlertDialog.Builder login = new AlertDialog.Builder(context);
+
                     login.setMessage(result);
                     login.setCancelable(false);
                     login.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -237,5 +239,5 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher, Com
             }
         }
     }
-        */
+
 }

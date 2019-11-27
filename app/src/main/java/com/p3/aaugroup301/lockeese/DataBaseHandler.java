@@ -43,7 +43,7 @@ public class DataBaseHandler {
 
 
     //Login
-    public String login(String username,String password){
+    public String login(String username, String password){
         Log.e("verify user","start");
         StringBlockingQueue.clear();
         Query userWithTheUsername = db.collection(USERS_COLLECTION).whereEqualTo(USERNAME, username).whereEqualTo(PASSWORD,password);
