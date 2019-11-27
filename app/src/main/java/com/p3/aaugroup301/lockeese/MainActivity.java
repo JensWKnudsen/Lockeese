@@ -28,6 +28,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        DataBaseHandler dataBaseHandler = new DataBaseHandler();
+        dataBaseHandler.login("1","1");
+        dataBaseHandler.changeNameOfKey("New test key name","1hFRX1f15u4goxLmgfla");
+
+        /*
         EncryptionHandler keyGeneration = new EncryptionHandler();
         try {
             PiDiffieHelman piDiffieHelman = new PiDiffieHelman();
@@ -110,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d("encrypt", "recived message: " + Arrays.toString(message));
             */
 
-
+        /*
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (NoSuchPaddingException e) {
@@ -126,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (InvalidKeySpecException e) {
             e.printStackTrace();
         }
-
+        */
 
     }
 }
