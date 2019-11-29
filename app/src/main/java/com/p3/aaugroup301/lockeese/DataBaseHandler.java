@@ -1,6 +1,7 @@
 package com.p3.aaugroup301.lockeese;
 
 
+import android.provider.DocumentsContract;
 import android.util.Log;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -15,8 +16,13 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 
@@ -27,6 +33,7 @@ public class DataBaseHandler {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();//creates an object/reference of the database "db"
     private static final String USERS_COLLECTION = "Users"; //Name of the user collection in the database
     private static final String LOCKS_COLLECTION = "Locks";
+    private static final String USERSOFLOCK_COLLECTION = "UsersOfLock";
     private static final String NAME_OF_KEY = "Name";
     private static final String KEYS_COLLECTION = "Keys";
     private static final String USERNAME = "Username";
@@ -34,13 +41,14 @@ public class DataBaseHandler {
     private static final String HASH = "Hash";
     private static final String LOCKID = "LockID";
     private static final String ACCESS_LEVEL = "Access Level";
+    private static final String USERID = "UserID";
 
 
     private static ArrayBlockingQueue<String> StringBlockingQueue = new ArrayBlockingQueue<>(1);
     private static ArrayBlockingQueue<ArrayList<String>> stringArrayBlockingQueue = new ArrayBlockingQueue<>(1);
 
-    String currentUserID;
-
+    static String currentUserID;
+    static String currentUserName;
 
     //Login
     public String login(String username, String password){
@@ -73,10 +81,9 @@ public class DataBaseHandler {
         });
 
         try {
-            Log.i("Sokol", "Before take()");
             String temp = StringBlockingQueue.take();
-            Log.i("Sokol", "After take(), id: " + temp);
             currentUserID = temp;
+            currentUserName = username;
             return temp;
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -155,7 +162,7 @@ public class DataBaseHandler {
     }
 
 
-    public void shareKey(String username, String lockID, String accessLevel){
+    public void shareKey(String username, String lockID, String lockName, String accessLevel){
         StringBlockingQueue.clear();
         String userSharedWith;
 
@@ -179,17 +186,47 @@ public class DataBaseHandler {
         });
         try {
             userSharedWith = StringBlockingQueue.take();
-        } catch (InterruptedException e) {
+
+            Map<String, Object> lockData = new HashMap<>();
+            db.collection(LOCKS_COLLECTION).document(lockID).collection(USERS_COLLECTION).document(userSharedWith).set(lockData);
+
+
+            Date currentDate = new Date(  );
+            String hashKeyInput = userSharedWith + currentDate + lockID;
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] encodedHash = digest.digest(hashKeyInput.getBytes(StandardCharsets.UTF_8));
+
+            Map<String, Object> keyData = new HashMap<>();
+            keyData.put(NAME_OF_KEY, lockName + " (" + currentUserName + ")");
+            keyData.put(LOCKID, lockID);
+            keyData.put(ACCESS_LEVEL, accessLevel);
+            keyData.put(HASH, encodedHash);
+            db.collection(USERS_COLLECTION).document(userSharedWith).collection(KEYS_COLLECTION).add(keyData);
+
+        } catch (InterruptedException | NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
-
-
-
-
     }
 
-
     //get locks lockname listOfUsersOnTheLock timeRemaining
+    public ArrayList getLocks(){
+        final ArrayList<ArrayList> listOfLocks = new ArrayList<>();
+        db.collectionGroup(USERSOFLOCK_COLLECTION).whereEqualTo(USERID,currentUserID).get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                        List<DocumentSnapshot> documents = queryDocumentSnapshots.getDocuments();
+                        documents.get(0).getId();
+
+                    }
+                });
+
+
+
+        return listOfLocks;
+    }
+
 
     //delete user from lock (username, lockID)
 
