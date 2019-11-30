@@ -161,6 +161,26 @@ public class DataBaseHandler {
 
     }
 
+    public ArrayList<String> getUsers() {
+        Query allUsers = db.collection(USERS_COLLECTION);
+        final ArrayList<String> listOfUsers = new ArrayList<>();
+        allUsers.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Log.w("getUSers", document.get("Username").toString());
+                        listOfUsers.add(document.get("Username").toString());
+                    }
+                } else {
+                    Log.w("getUsers", "Error getting documents.", task.getException());
+                }
+            }
+        });
+
+        return listOfUsers;
+    }
+
 
     public void shareKey(String username, String lockID, String lockName, String accessLevel){
         StringBlockingQueue.clear();

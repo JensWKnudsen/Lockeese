@@ -181,7 +181,7 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher, Com
         private String result;
         DataBaseHandler dataBaseHandler = new DataBaseHandler();
 
-        UserLoginTask(String username, String password, Context context) {
+      public UserLoginTask(String username, String password, Context context) {
             this.context = context;
             this.username = username;
             this.password = password;

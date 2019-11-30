@@ -24,26 +24,32 @@ public class ListOfLocksActivity extends AppCompatActivity {
     private int userNumber;
     private ArrayList<User> listOfSharedKeysForTheChosenLock = new ArrayList<>();
     Context context;
-    private ImageButton imageButtonDEleteUserFromSharedList;
+   // private ImageButton imageButtonDEleteUserFromSharedList;
     private ImageButton imageButtonShareTheLock;
     private static final String[] COUNTRY_KEY_ARRAY = {"Denmark", "Greece", "USA", "Spain", "France", "Slovakia", "Romania",
             "Japan", "Norway", "The United Kingdom", "Netherlands", "Italy", "Turkey"};
 
     private static final String[] LOCKS_DUMMY_ARRAY = {"Home Lock", "Office Lock", "summer house", "car"};
     public View row;
+    private DataBaseHandler dbh;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        dbh = new DataBaseHandler();
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_of_locks);
 
+
         listOfSharedKeys = findViewById(R.id.spinnerListOfGivenKeys);
-        imageButtonDEleteUserFromSharedList = findViewById(R.id.imageButtonDEleteUserFromSharedList);
+       // imageButtonDEleteUserFromSharedList = findViewById(R.id.imageButtonDEleteUserFromSharedList);
         imageButtonShareTheLock = findViewById (R.id.imageButtonShareTheLock);
 
         //change the dummy array to firebase list of users listOfUsersWithKey
-        ArrayList<String> listOfUsersWithKey = new ArrayList<>(Arrays.asList(COUNTRY_KEY_ARRAY));
 
+        ArrayList<String> listOfUsersWithKey = new ArrayList<>(Arrays.asList(COUNTRY_KEY_ARRAY));
+        listOfUsersWithKey = dbh.getUsers();
 
         ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, listOfUsersWithKey);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -64,7 +70,7 @@ public class ListOfLocksActivity extends AppCompatActivity {
             LOLdisplayed.addView(nameOfALock);
             LOLdisplayed.addView(tvClick2CWho);
             LOLdisplayed.addView(listOfSharedKeys);
-            LOLdisplayed.addView(imageButtonDEleteUserFromSharedList);
+            //LOLdisplayed.addView(imageButtonDEleteUserFromSharedList);
             LOLdisplayed.addView(imageButtonShareTheLock);
 
             context = this;
@@ -74,4 +80,6 @@ public class ListOfLocksActivity extends AppCompatActivity {
         }
 
     }
+
+
 }
