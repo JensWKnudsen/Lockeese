@@ -34,6 +34,7 @@ public class DataBaseHandler {
     private static final String USERS_COLLECTION = "Users"; //Name of the user collection in the database
     private static final String LOCKS_COLLECTION = "Locks";
     private static final String USERSOFLOCK_COLLECTION = "UsersOfLock";
+    private static final String EXPIRATION = "Expiration";
     private static final String NAME_OF_KEY = "Name";
     private static final String KEYS_COLLECTION = "Keys";
     private static final String USERNAME = "Username";
@@ -149,6 +150,7 @@ public class DataBaseHandler {
                         listOfKeyData.add(document.get(HASH));
                         listOfKeyData.add(document.get(LOCKID));
                         listOfKeyData.add(document.get(ACCESS_LEVEL));
+                        listOfKeyData.add(document.get(EXPIRATION));
                         listOfKeys.add(listOfKeyData);
                     }
                 } else {
@@ -230,18 +232,31 @@ public class DataBaseHandler {
 
     //get locks lockname listOfUsersOnTheLock timeRemaining
     public ArrayList getLocks(){
+        stringArrayBlockingQueue.clear();
+        ArrayList<String> listOfIDs;
         final ArrayList<ArrayList> listOfLocks = new ArrayList<>();
-        db.collectionGroup(USERSOFLOCK_COLLECTION).whereEqualTo(USERID,currentUserID).get()
+        db.collection(USERS_COLLECTION).document(currentUserID).collection(LOCKS_COLLECTION).get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
 
-                        List<DocumentSnapshot> documents = queryDocumentSnapshots.getDocuments();
-                        documents.get(0).getId();
+                        ArrayList<String> listOfIDs = new ArrayList<>();
+                        for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
+                            listOfIDs.add(document.getId());
+                        }
+                        try {
+                            stringArrayBlockingQueue.put(listOfIDs);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
 
                     }
                 });
-
+        try {
+            listOfIDs = stringArrayBlockingQueue.take();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
 
         return listOfLocks;
