@@ -136,7 +136,7 @@ public class DataBaseHandler {
 
 
     // get keys     time
-    public ArrayList getKeys(){
+    public ArrayList<ArrayList> getKeys(){
         Query userWithTheUsername = db.collection(USERS_COLLECTION).document(currentUserID).collection(KEYS_COLLECTION);
         final ArrayList<ArrayList> listOfKeys = new ArrayList<>();
         userWithTheUsername.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -233,7 +233,7 @@ public class DataBaseHandler {
     //get locks lockname listOfUsersOnTheLock timeRemaining
     public ArrayList getLocks(){
         stringArrayBlockingQueue.clear();
-        ArrayList<String> listOfIDs;
+        ArrayList<String> listOfIDs = new ArrayList<>();
         final ArrayList<ArrayList> listOfLocks = new ArrayList<>();
         db.collection(USERS_COLLECTION).document(currentUserID).collection(LOCKS_COLLECTION).get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -254,9 +254,42 @@ public class DataBaseHandler {
                 });
         try {
             listOfIDs = stringArrayBlockingQueue.take();
+
+            for (String id : listOfIDs ) {
+                db.collection(LOCKS_COLLECTION).document(currentUserID).collection(LOCKS_COLLECTION).get()
+                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                            @Override
+                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                                ArrayList<String> listOfIDs = new ArrayList<>();
+                                for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
+                                    listOfIDs.add(document.getId());
+                                }
+                                try {
+                                    stringArrayBlockingQueue.put(listOfIDs);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+
+                            }
+                        });
+                try {
+                    listOfIDs = stringArrayBlockingQueue.take();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+
+
+
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+
+
 
 
         return listOfLocks;
