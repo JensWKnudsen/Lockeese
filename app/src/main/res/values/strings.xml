@@ -26,4 +26,9 @@
     <!-- Strings for key list screen -->
 
     <string name="KeyIconImage">key</string>
+
+    <!-- Strings about us pop-up -->
+    <string name="aboutUsText">It is important to be aware of what personal data this app collects and how the data are used and
+    managed.</string>
+    <string name="agreeButton">Agree</string>
 </resources>

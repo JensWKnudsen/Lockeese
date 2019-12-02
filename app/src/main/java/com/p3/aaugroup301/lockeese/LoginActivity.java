@@ -41,43 +41,56 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher, Com
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login2);
+        super.onCreate( savedInstanceState );
+        setContentView( R.layout.activity_login2 );
 
-        sharedPreferences = getSharedPreferences(PREFERENCE_NAME, MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences( PREFERENCE_NAME, MODE_PRIVATE );
         editor = sharedPreferences.edit();
 
-        usernameView = findViewById(R.id.username);
-        passwordView = findViewById(R.id.password);
-        loginBtn = findViewById(R.id.login);
+        usernameView = findViewById( R.id.username );
+        passwordView = findViewById( R.id.password );
+        loginBtn = findViewById( R.id.login );
 
-        rememberMeCb = findViewById(R.id.checkBox);
+        rememberMeCb = findViewById( R.id.checkBox );
 
-        if(sharedPreferences.getBoolean(KEY_REMEMBER, false)){
-            rememberMeCb.setChecked(true);
-        }else {
-            rememberMeCb.setChecked(false);
+        if (sharedPreferences.getBoolean( KEY_REMEMBER, false )) {
+            rememberMeCb.setChecked( true );
+        } else {
+            rememberMeCb.setChecked( false );
         }
-        usernameView.setText(sharedPreferences.getString(KEY_USERNAME,""));
-        passwordView.setText(sharedPreferences.getString(KEY_PASSWORD,""));
+        usernameView.setText( sharedPreferences.getString( KEY_USERNAME, "" ) );
+        passwordView.setText( sharedPreferences.getString( KEY_PASSWORD, "" ) );
 
-        usernameView.addTextChangedListener(this);
-        passwordView.addTextChangedListener(this);
-        rememberMeCb.setOnCheckedChangeListener(this);
+        usernameView.addTextChangedListener( this );
+        passwordView.addTextChangedListener( this );
+        rememberMeCb.setOnCheckedChangeListener( this );
 
 
-        Log.e(" UDP client ","starting app");
+        Log.e( " UDP client ", "starting app" );
 
-        usernameView = findViewById(R.id.username);
-        passwordView = findViewById(R.id.password);
+        usernameView = findViewById( R.id.username );
+        passwordView = findViewById( R.id.password );
+        // Create a button handler and call the dialog box display method in it
+        Button aboutUsButton = findViewById( R.id.aboutUsButton );
+        aboutUsButton.
+                setOnClickListener( new View.OnClickListener() {
 
-        Button mEmailSignInButton = findViewById(R.id.login);
-        mEmailSignInButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        PopUpWindow popUpClass = new PopUpWindow();
+                        popUpClass.showPopupWindow( v );
+                    }
+                } );
+
+
+        Button mEmailSignInButton = findViewById( R.id.login );
+        mEmailSignInButton.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 attemptLogin();
             }
-        });
+        } );
     }
 
     private void attemptLogin() {

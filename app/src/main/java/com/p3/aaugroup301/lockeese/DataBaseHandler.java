@@ -137,7 +137,7 @@ public class DataBaseHandler {
 
 
     // get keys     time
-    public ArrayList<KeysHashes> getKeys(){
+    public ArrayList<KeysHashes> getKeyHashes(){
         Query userWithTheUsername = db.collection(USERS_COLLECTION).document(currentUserID).collection(KEYS_COLLECTION);
         final ArrayList<KeysHashes> listOfKeys = new ArrayList<>();
         userWithTheUsername.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {

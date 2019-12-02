@@ -54,10 +54,10 @@ public class ListAdapter extends BaseAdapter {
         }
         final KeysHashes keysHashes = getItem(position);
 
-        keysListViewHolder.keyNameAndUser.setText(keysHashes.KeyName );
-        keysListViewHolder.timer.setText("time left: " + keysHashes.Timer);
+        keysListViewHolder.keyNameAndUser.setText(keysHashes.keyName );
+        keysListViewHolder.timer.setText("time left: " + keysHashes.expirationDate);
         //create updateTimer method
-        keysListViewHolder.accessLevel.setText("access level: " + keysHashes.AccessLevel);
+        keysListViewHolder.accessLevel.setText("access level: " + keysHashes.accessLevel );
         keysListViewHolder.deleteButton.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View view) {

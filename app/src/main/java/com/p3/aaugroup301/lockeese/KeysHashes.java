@@ -3,44 +3,44 @@ package com.p3.aaugroup301.lockeese;
 import com.google.firebase.Timestamp;
 
 public class KeysHashes {
-    String KeyName;
-    String KeyID;
-    String KeyHash;
+    String keyName;
+    String keyID;
+    String keyHash;
     String LockID;
-    int AccessLevel;
-    Timestamp Timer;
+    int accessLevel;
+    Timestamp expirationDate;
 
-    public KeysHashes(String keyName, String keyID, String keyHash, String lockID, int accessLevel, Timestamp timer) {
-        this.KeyName = keyName;
-        this.KeyID = keyID;
-        this.KeyHash = keyHash;
+    public KeysHashes(String keyName, String keyID, String keyHash, String lockID, int accessLevel, Timestamp expirationDate) {
+        this.keyName = keyName;
+        this.keyID = keyID;
+        this.keyHash = keyHash;
         this.LockID = lockID;
-        this.AccessLevel = accessLevel;
-        this.Timer = timer;
+        this.accessLevel = accessLevel;
+        this.expirationDate = expirationDate;
     }
 
     public String getKeyName() {
-        return KeyName;
+        return keyName;
     }
 
     public void setKeyName(String keyName) {
-        KeyName = keyName;
+        this.keyName = keyName;
     }
 
     public String getKeyID() {
-        return KeyID;
+        return keyID;
     }
 
     public void setKeyID(String keyID) {
-        KeyID = keyID;
+        this.keyID = keyID;
     }
 
     public String getKeyHash() {
-        return KeyHash;
+        return keyHash;
     }
 
     public void setKeyHash(String keyHash) {
-        KeyHash = keyHash;
+        this.keyHash = keyHash;
     }
 
     public String getLockID() {
@@ -52,19 +52,19 @@ public class KeysHashes {
     }
 
     public int getAccessLevel() {
-        return AccessLevel;
+        return accessLevel;
     }
 
     public void setAccessLevel(int accessLevel) {
-        AccessLevel = accessLevel;
+        this.accessLevel = accessLevel;
     }
 
     public Timestamp getTimer() {
-        return Timer;
+        return expirationDate;
     }
 
     public void setTimer(Timestamp timer) {
-        Timer = timer;
+        expirationDate = timer;
     }
 
 

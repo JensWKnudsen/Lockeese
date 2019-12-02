@@ -20,8 +20,6 @@
         android:theme="@style/AppTheme">
         <activity android:name=".KeysListActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"></activity>
-        <activity android:name=".ListOfLocksActivity"
-           ></activity>
         <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -30,7 +28,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity"></activity>
-
+        <activity android:name=".PopUpWindow">
+        </activity>
         <service
             android:name=".HCEService"
             android:exported="true"

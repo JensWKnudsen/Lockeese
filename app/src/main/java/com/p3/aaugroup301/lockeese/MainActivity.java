@@ -4,6 +4,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 
 import java.nio.ByteBuffer;
 import java.security.InvalidAlgorithmParameterException;
@@ -11,7 +14,9 @@ import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -28,9 +33,21 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        DataBaseHandler dataBaseHandler = new DataBaseHandler();
+      /*  DataBaseHandler dataBaseHandler = new DataBaseHandler();
         dataBaseHandler.login("1","1");
-        dataBaseHandler.changeNameOfKey("New test key name","1hFRX1f15u4goxLmgfla");
+        dataBaseHandler.changeNameOfKey("New test key name","1hFRX1f15u4goxLmgfla");*/
+        Button dattBtn = findViewById( R.id.button3 );
+        dattBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Date date = new Date(  );
+                SimpleDateFormat dateFormat = new SimpleDateFormat(  " E dd-M-yyyy hh:mm:ss");
+                Toast currentDate = Toast.makeText( getApplicationContext(), dateFormat.format( date ).toString(), Toast.LENGTH_SHORT  );
+                currentDate.show();
+            }
+        });
+
+
 
         /*
         EncryptionHandler keyGeneration = new EncryptionHandler();

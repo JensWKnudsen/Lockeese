@@ -7,5 +7,6 @@
     <color name="colorGreen">#29cb0c</color>
     <color name="colorRed">#de0b07</color>
     <color name="colorGrey">#626662</color>
+    <color name="blueColor">#00FFFF</color>
 
 </resources>

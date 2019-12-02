@@ -7,14 +7,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
-
+import com.google.firebase.Timestamp;
 import java.util.Date;
-
 import java.util.ArrayList;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -23,7 +20,7 @@ import androidx.appcompat.app.AppCompatActivity;
 public class KeysListActivity extends AppCompatActivity {
 
      Context context;
-
+     DataBaseHandler dataBaseHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,8 +28,12 @@ public class KeysListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_keys_list);
         ListView listView;
         listView = findViewById(R.id.customListView);
-        ListAdapter keyListAdapter = new ListAdapter(this, getKeyHash());
+        ListAdapter keyListAdapter = new ListAdapter(this, dataBaseHandler.getKeyHashes());
         listView.setAdapter(keyListAdapter);
+        dataBaseHandler = new DataBaseHandler();
+        for(int i=0; i<=dataBaseHandler.getKeyHashes().size(); i++){
+            getRemainingTime( dataBaseHandler.getKeyHashes().get( i ) );
+        }
         Button nextScreenButton = findViewById(R.id.nextScreenButton);
         nextScreenButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -47,37 +48,20 @@ public class KeysListActivity extends AppCompatActivity {
 
     }
 
-    public ArrayList<KeysHashes> getKeyHash() {
-        ArrayList<KeysHashes> keysHashesArrayList = new ArrayList<>();
-        keysHashesArrayList.add(new KeysHashes("0000", "Summer House key (Tom)", "sxdchgj", 1, 345676, "gh"));
-        keysHashesArrayList.add(new KeysHashes("0001", "House (Jerry)", "hhgg", 3, 34576, "gkjhh"));
-        keysHashesArrayList.add(new KeysHashes("0002", "Office (John)", "kjihvgf", 4, 3676, "ghhg"));
-        keysHashesArrayList.add(new KeysHashes("0003", "Garage (Perry)", "jhc", 2, 376, "gjhh"));
-        keysHashesArrayList.add(new KeysHashes("0004", "BF place (Perry)", "hgcxcv", 2, 34567, "gjhgh"));
-        return keysHashesArrayList;
-    }
 
-    public String getRemainingTime(int currentUser) {
-        long expirationTime = getKeyHash().get(1).Timer;
-        Date expirationDate = new Date(expirationTime);
+    public void getRemainingTime (KeysHashes keysHashes){
+        Timestamp expirationTime =  keysHashes.expirationDate;
+        long expirationDate = expirationTime.getSeconds();
+        Date expirationDateD = new Date(expirationDate);
         Date currentDate = new Date();
-        if (currentDate.after(expirationDate)) {
+        if (currentDate.after(expirationDateD)) {
             //delete key
+            dataBaseHandler.removeKey( String.valueOf(keysHashes.keyID),String.valueOf(keysHashes.LockID) );
         }
-        return expirationDate.toString();
+
     }
 
-/*
-        public long onTicking(int size) {
-        //display how much time remains
-         long  expirationTime = getKeyHash().get(size).Timer;
-           return expirationTime / 1000;
 
-        }
-
-        public void onFinish() {
-            //delete key from this user's list
-        }
 
 
 
