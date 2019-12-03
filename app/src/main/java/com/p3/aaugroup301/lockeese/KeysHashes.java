@@ -7,10 +7,10 @@ public class KeysHashes {
     String keyID;
     String keyHash;
     String LockID;
-    long accessLevel;
+    Integer accessLevel;
     Timestamp expirationDate;
 
-    public KeysHashes(String keyName, String keyID, String keyHash, String lockID, long accessLevel, Timestamp expirationDate) {
+    public KeysHashes(String keyName, String keyID, String keyHash, String lockID, Integer accessLevel, Timestamp expirationDate) {
         this.keyName = keyName;
         this.keyID = keyID;
         this.keyHash = keyHash;
@@ -51,11 +51,11 @@ public class KeysHashes {
         LockID = lockID;
     }
 
-    public long getAccessLevel() {
+    public Integer getAccessLevel() {
         return accessLevel;
     }
 
-    public void setAccessLevel(long accessLevel) {
+    public void setAccessLevel(Integer accessLevel) {
         this.accessLevel = accessLevel;
     }
 

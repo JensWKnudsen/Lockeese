@@ -155,7 +155,7 @@ public class DataBaseHandler {
                         String id = document.getId();
                         String hash = document.getString(HASH);
                         String lockid = document.getString(LOCKID);
-                        long accessLevel = (long) document.get(ACCESS_LEVEL);
+                        Integer accessLevel = document.getLong(ACCESS_LEVEL).intValue();
                         Timestamp timestamp = document.getTimestamp(EXPIRATION);
                         KeysHashes keysHashes = new KeysHashes(name,id,hash,lockid,accessLevel,timestamp);
                         listOfKeys.add(keysHashes);

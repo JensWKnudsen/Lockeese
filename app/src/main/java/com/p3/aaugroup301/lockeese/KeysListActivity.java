@@ -3,7 +3,6 @@ package com.p3.aaugroup301.lockeese;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -22,21 +21,16 @@ public class KeysListActivity extends AppCompatActivity {
 
      Context context;
      DataBaseHandler dataBaseHandler;
+     ListView listView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_keys_list);
-        ListView listView;
         listView = findViewById(R.id.customListView);
         dataBaseHandler = new DataBaseHandler();
-        ArrayList<KeysHashes> listOfKeys = dataBaseHandler.getKeyHashes();
-        Log.d("asynctest", "list of keys is size:" + listOfKeys.size());
-        ListAdapter keyListAdapter = new ListAdapter(this, listOfKeys);
-        listView.setAdapter(keyListAdapter);
-        for(int i=0; i<=listOfKeys.size()-1; i++){
-            getRemainingTime( listOfKeys.get( i) );
-        }
+        Log.e("SearchLocks", "before GetKeysAsyncTask");
+
         Button nextScreenButton = findViewById(R.id.nextScreenButton);
         nextScreenButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -44,23 +38,23 @@ public class KeysListActivity extends AppCompatActivity {
                 Context context = view.getContext();
                 Intent intent = new Intent(context, ListOfLocksActivity.class);
                    context.startActivity(intent);
-               // GoToLOLTask goToLOLTask = new GoToLOLTask();
 
             }
         });
-
+        GetKeysAsyncTask getKeysAsyncTask = new GetKeysAsyncTask(context);
+        getKeysAsyncTask.execute((Void) null);
+        Log.e("SearchLocks", "After AsyncTask" );
     }
-
 
     public void getRemainingTime (KeysHashes keysHashes){
         Timestamp expirationTime =  keysHashes.expirationDate;
         long expirationDate = expirationTime.getSeconds();
         Date expirationDateD = new Date(expirationDate);
         Date currentDate = new Date();
-        if (currentDate.after(expirationDateD)) {
-            //delete key
-            dataBaseHandler.removeKey( String.valueOf(keysHashes.keyID),String.valueOf(keysHashes.LockID) );
-        }
+//        if (currentDate.after(expirationDateD)) {
+//            //delete key
+//            dataBaseHandler.removeKey( String.valueOf(keysHashes.keyID),String.valueOf(keysHashes.LockID) );
+//        }
 
     }
 
@@ -95,65 +89,72 @@ public class KeysListActivity extends AppCompatActivity {
 
     /**
      * Represents an asynchronous changing activity task used to fetch the data
-     * about the user from the database
+     * about the keys that the user has from the database
+*/
 
+    public class GetKeysAsyncTask extends AsyncTask<Void, Void, String> {
 
-    public class GoToLOLTask extends AsyncTask<Void, Void, String> {
-
-        private Context context;
+        Context context;
         private ProgressDialog progressDialog;
-        private ArrayList<ArrayList> listOfLocks = new ArrayList<>();
+        ArrayList<KeysHashes> listOfKeys = new ArrayList<>();
         DataBaseHandler dataBaseHandler = new DataBaseHandler();
 
-       /** public GoToLOLTask(Context context) {
+       public GetKeysAsyncTask(Context context) {
             this.context = context;
         }
 
         @Override
         protected void onPreExecute() {
-            progressDialog = new ProgressDialog(context);
-            progressDialog.setTitle("Loading your locks");
-            progressDialog.setMessage("Please hang on");
+
+            progressDialog = new ProgressDialog(KeysListActivity.this);
+            progressDialog.setTitle("Loading Your keys");
+            progressDialog.setMessage("Please wait");
             progressDialog.show();
         }
 
-
         @Override
         protected String doInBackground(Void... voids) {
-            Log.e("SearchLocks", "do in background: " + listOfLocks.toString());
-            String result = "Something went wrong when searching";
+            Log.e("SearchLocks", "do in background: " + listOfKeys.toString());
+           // String result = "Something went wrong when searching";
 
             synchronized (this) {
                 try {
-
-                    listOfLocks = dataBaseHandler.getLocks();
-                    Log.e("SearchLocks", "result from search: " + listOfLocks.toString());
-                    result = "success";
-
+                    listOfKeys = dataBaseHandler.getKeyHashes();
+                    Log.e("asynctest", "list of keys is size:" + listOfKeys.size());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-            return result;
+            return "Success";
         }
 
 
         @Override
         protected void onPostExecute(String result) {
-
             if (progressDialog.isShowing()) {
+                progressDialog.setMessage("Success");
                 progressDialog.dismiss();
-                AlertDialog.Builder lolActivity = new AlertDialog.Builder(context);
-                lolActivity.setMessage(result);
-                if (result.equals("success"))
-                    context.startActivity(new Intent(context, ListOfLocksActivity.class));
             }
 
+            //super.onPostExecute(listOfKeys);
+            Log.e("SearchLocks", "Adapter before called " );
+            ListAdapter keyListAdapter = new ListAdapter(KeysListActivity.this,listOfKeys );
+            ListView listView1 = findViewById(R.id.customListView);
+
+            listView1.setAdapter(keyListAdapter);
+
+            Log.d("SearchLocks", "After AsyncTask before the for loop" );
+            Log.e("SearchLocks", "Inside for loop " + listOfKeys.size() );
+
+            for(int i=0; i<=listOfKeys.size()-1; i++){
+                Log.e("SearchLocks", "Inside for loop " + listOfKeys.size() );
+                getRemainingTime( listOfKeys.get(i) );
+                Log.e("SearchLocks", "After AsyncTask after the for loop" );
+            }
         }
 
 
     }
-
-    */
 }
+
 
