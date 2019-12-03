@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
@@ -28,11 +29,13 @@ public class KeysListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_keys_list);
         ListView listView;
         listView = findViewById(R.id.customListView);
-        ListAdapter keyListAdapter = new ListAdapter(this, dataBaseHandler.getKeyHashes());
-        listView.setAdapter(keyListAdapter);
         dataBaseHandler = new DataBaseHandler();
-        for(int i=0; i<=dataBaseHandler.getKeyHashes().size(); i++){
-            getRemainingTime( dataBaseHandler.getKeyHashes().get( i ) );
+        ArrayList<KeysHashes> listOfKeys = dataBaseHandler.getKeyHashes();
+        Log.d("asynctest", "list of keys is size:" + listOfKeys.size());
+        ListAdapter keyListAdapter = new ListAdapter(this, listOfKeys);
+        listView.setAdapter(keyListAdapter);
+        for(int i=0; i<=listOfKeys.size()-1; i++){
+            getRemainingTime( listOfKeys.get( i) );
         }
         Button nextScreenButton = findViewById(R.id.nextScreenButton);
         nextScreenButton.setOnClickListener(new View.OnClickListener() {

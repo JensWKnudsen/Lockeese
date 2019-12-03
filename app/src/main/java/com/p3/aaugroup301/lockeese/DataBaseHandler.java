@@ -42,11 +42,13 @@ public class DataBaseHandler {
     private static final String LOCKID = "LockID";
     private static final String ACCESS_LEVEL = "Access Level";
     private static final String USERID = "UserID";
+    private static final String KEY = "Key";
 
 
     private static ArrayBlockingQueue<String> StringBlockingQueue = new ArrayBlockingQueue<>(1);
     private static ArrayBlockingQueue<ArrayList<String>> stringArrayBlockingQueue = new ArrayBlockingQueue<>(1);
     private static ArrayBlockingQueue<ArrayList<ArrayList>> ArrayArrayBlockingQueue = new ArrayBlockingQueue<>(1);
+    private static ArrayBlockingQueue<ArrayList<KeysHashes>> ArrayHashesBlockingQueue = new ArrayBlockingQueue<>(1);
 
 
     static String currentUserID;
@@ -138,12 +140,14 @@ public class DataBaseHandler {
 
     // get keys     time
     public ArrayList<KeysHashes> getKeyHashes(){
+        ArrayHashesBlockingQueue.clear();
         Query userWithTheUsername = db.collection(USERS_COLLECTION).document(currentUserID).collection(KEYS_COLLECTION);
-        final ArrayList<KeysHashes> listOfKeys = new ArrayList<>();
+        ArrayList<KeysHashes> listOfKeys = new ArrayList<>();
         userWithTheUsername.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
+                    ArrayList<KeysHashes> listOfKeys = new ArrayList<>();
                     for (QueryDocumentSnapshot document : task.getResult()) {
 
 
@@ -151,16 +155,27 @@ public class DataBaseHandler {
                         String id = document.getId();
                         String hash = document.getString(HASH);
                         String lockid = document.getString(LOCKID);
-                        int accessLevel = (int) document.get(ACCESS_LEVEL);
+                        long accessLevel = (long) document.get(ACCESS_LEVEL);
                         Timestamp timestamp = document.getTimestamp(EXPIRATION);
                         KeysHashes keysHashes = new KeysHashes(name,id,hash,lockid,accessLevel,timestamp);
                         listOfKeys.add(keysHashes);
+
+                    }
+                    try {
+                        ArrayHashesBlockingQueue.put(listOfKeys);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
                 } else {
                     Log.w("getKeys", "Error getting documents.", task.getException());
                 }
             }
         });
+        try {
+            listOfKeys = ArrayHashesBlockingQueue.take();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         return listOfKeys;
 
@@ -234,7 +249,7 @@ public class DataBaseHandler {
     }
 
     //get locks lockname listOfUsersOnTheLock timeRemaining
-    public void getLocks(){
+    public ArrayList<ArrayList<ArrayList>> getLocks(){
         stringArrayBlockingQueue.clear();
         ArrayList<String> listOfIDs = new ArrayList<>();
 
@@ -259,22 +274,26 @@ public class DataBaseHandler {
             listOfIDs = stringArrayBlockingQueue.take();
 
             ArrayArrayBlockingQueue.clear();
-            ArrayList<ArrayList> listOfLocks = new ArrayList<>();
+            ArrayList<ArrayList<ArrayList>> listOfLocks = new ArrayList<>();
             for (String id : listOfIDs ) {
+                ArrayList<ArrayList> usersOfLock = new ArrayList<>();
                 db.collection(LOCKS_COLLECTION).document(id).collection(USERSOFLOCK_COLLECTION).get()
                         .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                             @Override
                             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
 
-                                ArrayList<ArrayList> listOfLocks = new ArrayList<>();
+                                ArrayList<ArrayList> usersOfLock = new ArrayList<>();
                                 for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
-                                    ArrayList lock = new ArrayList();
-                                    lock.add(document.getId());
-                                    lock.add(document);
-                                    listOfLocks.add(lock);
+                                    ArrayList user = new ArrayList();
+                                    user.add(document.getId());
+                                    user.add(document.get(ACCESS_LEVEL));
+                                    user.add(document.getString(KEY));
+                                    user.add(document.getString(USERID));
+                                    user.add(document.getString(USERNAME));
+                                    usersOfLock.add(user);
                                 }
                                 try {
-                                    ArrayArrayBlockingQueue.put(listOfLocks);
+                                    ArrayArrayBlockingQueue.put(usersOfLock);
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
                                 }
@@ -282,7 +301,10 @@ public class DataBaseHandler {
                             }
                         });
                 try {
-                    listOfLocks = ArrayArrayBlockingQueue.take();
+                    usersOfLock = ArrayArrayBlockingQueue.take();
+                    listOfLocks.add(usersOfLock);
+
+                    return listOfLocks;
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -297,10 +319,7 @@ public class DataBaseHandler {
         }
 
 
-
-
-
-        //return listOfLocks;
+        return null;
     }
 
 
