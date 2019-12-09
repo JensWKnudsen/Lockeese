@@ -49,6 +49,7 @@ public class DataBaseHandler {
     private static ArrayBlockingQueue<ArrayList<String>> stringArrayBlockingQueue = new ArrayBlockingQueue<>(1);
     private static ArrayBlockingQueue<ArrayList<ArrayList>> ArrayArrayBlockingQueue = new ArrayBlockingQueue<>(1);
     private static ArrayBlockingQueue<ArrayList<KeysHashes>> ArrayHashesBlockingQueue = new ArrayBlockingQueue<>(1);
+    private static ArrayBlockingQueue<ArrayList<ListOfLocks>> ArrayListOfLocksBlockingQueue = new ArrayBlockingQueue<>(1);
 
 
     static String currentUserID;
@@ -249,79 +250,72 @@ public class DataBaseHandler {
     }
 
     //get locks lockname listOfUsersOnTheLock timeRemaining
-    public ArrayList<ArrayList<ArrayList>> getLocks(){
-        stringArrayBlockingQueue.clear();
-        ArrayList<String> listOfIDs = new ArrayList<>();
+    public ArrayList<ListOfLocks> getLocks() {
+        ArrayListOfLocksBlockingQueue.clear();
+        final ArrayList<ListOfLocks> listOfIDs = new ArrayList<>();
 
         db.collection(USERS_COLLECTION).document(currentUserID).collection(LOCKS_COLLECTION).get()
                 .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
 
-                        ArrayList<String> listOfIDs = new ArrayList<>();
                         for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
-                            listOfIDs.add(document.getId());
+                            ListOfLocks listOfLocks = new ListOfLocks(document.getString("LockName"), currentUserID, currentUserName, document.getId());
+                            Log.w("getLocks", document.getString("LockName").toString());
+                            Log.w("getLocks", document.getString("LockID").toString());
+                            listOfIDs.add(listOfLocks);
                         }
                         try {
-                            stringArrayBlockingQueue.put(listOfIDs);
+                            ArrayListOfLocksBlockingQueue.put(listOfIDs);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
-
                     }
                 });
-        try {
-            listOfIDs = stringArrayBlockingQueue.take();
 
-            ArrayArrayBlockingQueue.clear();
-            ArrayList<ArrayList<ArrayList>> listOfLocks = new ArrayList<>();
-            for (String id : listOfIDs ) {
-                ArrayList<ArrayList> usersOfLock = new ArrayList<>();
-                db.collection(LOCKS_COLLECTION).document(id).collection(USERSOFLOCK_COLLECTION).get()
-                        .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                            @Override
-                            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        //listOfIDs = ArrayListOfLocksBlockingQueue.take().get(0);
 
-                                ArrayList<ArrayList> usersOfLock = new ArrayList<>();
-                                for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
-                                    ArrayList user = new ArrayList();
-                                    user.add(document.getId());
-                                    user.add(document.get(ACCESS_LEVEL));
-                                    user.add(document.getString(KEY));
-                                    user.add(document.getString(USERID));
-                                    user.add(document.getString(USERNAME));
-                                    usersOfLock.add(user);
-                                }
-                                try {
-                                    ArrayArrayBlockingQueue.put(usersOfLock);
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
+                        ArrayArrayBlockingQueue.clear();
+                        //ArrayList<ArrayList<ArrayList>> listOfLocks = new ArrayList<>();
+                        final ArrayList<ArrayList> usersOfLock = new ArrayList<>();
+                        Log.w("getLocks- size", listOfIDs.size() + " count");
+                        for (ListOfLocks id : listOfIDs) {
+                            Log.w("getLocks- size", "id : " + id.getLockId());
+                            db.collection(LOCKS_COLLECTION).document("YMEASpZeGuDIJu7s1fyd").collection(USERSOFLOCK_COLLECTION).get()
+                                    .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                        @Override
+                                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                            Log.w("getLocks INside", " onSuccess");
+                                            for (DocumentSnapshot document : queryDocumentSnapshots.getDocuments()) {
+                                                ArrayList user = new ArrayList();
+                                                user.add(document.getId());
+                                                user.add(document.get(ACCESS_LEVEL));
+                                                user.add(document.getString(KEY));
+                                                user.add(document.getString(USERID));
+                                                user.add(document.getString(USERNAME));
+                                                Log.w("getLocks INside", document.getString(USERID).toString());
+                                                usersOfLock.add(user);
+                                            }
+                                            try {
+                                                ArrayArrayBlockingQueue.put(usersOfLock);
+                                            } catch (InterruptedException e) {
+                                                e.printStackTrace();
+                                            }
 
+                                        }
+                                    });
+
+                            try {
+                                id.usersOfLock = ArrayArrayBlockingQueue.take().get(0);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
                             }
-                        });
-                try {
-                    usersOfLock = ArrayArrayBlockingQueue.take();
-                    listOfLocks.add(usersOfLock);
+                        }
 
-                    return listOfLocks;
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
+        Log.w("getLocks- size",listOfIDs.toString());
+        return listOfIDs;
 
-
-
-
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-
-        return null;
     }
-
 
     //delete user from lock (username, lockID)
 

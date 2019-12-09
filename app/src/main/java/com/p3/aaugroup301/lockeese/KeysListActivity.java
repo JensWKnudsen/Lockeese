@@ -97,7 +97,7 @@ public class KeysListActivity extends AppCompatActivity {
         Context context;
         private ProgressDialog progressDialog;
         ArrayList<KeysHashes> listOfKeys = new ArrayList<>();
-        DataBaseHandler dataBaseHandler = new DataBaseHandler();
+        private DataBaseHandler dataBaseHandler = new DataBaseHandler();
 
        public GetKeysAsyncTask(Context context) {
             this.context = context;
@@ -152,8 +152,6 @@ public class KeysListActivity extends AppCompatActivity {
                 Log.e("SearchLocks", "After AsyncTask after the for loop" );
             }
         }
-
-
     }
 }
 

@@ -4,74 +4,91 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Spinner;
-import android.widget.TextView;
-
-import com.google.firebase.firestore.auth.User;
-
+import android.widget.BaseAdapter;
 import java.util.ArrayList;
-import java.util.List;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-public class LOLAdapter extends ArrayAdapter<ListOfLocks> {
+public class LOLAdapter extends BaseAdapter {
 
-    Context context;
-    int resource;
-    List<ListOfLocks> locksList;
+   private Context context;
+   public ArrayList<ListOfLocks> locksList;
 
+   public LOLAdapter(Context context, ArrayList<ListOfLocks> locksList){
 
+       this.context = context;
+       this.locksList = locksList;
+   }
 
-    public LOLAdapter(Context context, int resource, List<ListOfLocks> locksList){
-        super(context, resource, locksList);
+    @Override
+    public int getCount() {
+        return locksList.size();
+    }
 
-        this.context = context;
-        this.resource = resource;
-        this.locksList = locksList;
+    @Override
+    public ListOfLocks getItem(int position) {
+        return locksList.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return 0;
     }
 
     @NonNull
     @Override
     public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
 
-        final DataBaseHandler dataBaseHandler = new DataBaseHandler();
-        LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.list_of_locks_item, null);
-        EditText textViewNameOfTheLock = view.findViewById(R.id.tVnameOfTheLock);
-        TextView textViewIsSharedWith = view.findViewById(R.id.tVLockIsSharedWith);
-        Spinner listOfSharedKeys;
-        int userNumber;
-       // ArrayList<User> listOfSharedKeysForTheChosenLock = new ArrayList<>();
 
-        Button buttonDelete = view.findViewById(R.id.buttonDeleteKey);
-        Button buttonShare = view.findViewById(R.id.buttonSharkeKey);
-        Spinner spinner = view.findViewById(R.id.spinnerOfUsers);
+        View row;
+        final LockListViewHolder lockListViewHolder;
+        final DataBaseHandler dataBaseHandler = new DataBaseHandler();
+
+        if (convertView == null) {
+
+        LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        row = layoutInflater.inflate(R.layout.list_of_locks_item, parent, false);
+        lockListViewHolder = new LockListViewHolder();
+        lockListViewHolder.lockName = row.findViewById(R.id.tVnameOfTheLock);
+        lockListViewHolder.theLockIsSharedWith = row.findViewById(R.id.tVLockIsSharedWith);
+        lockListViewHolder.spinnerOfUsers = row.findViewById(R.id.spinnerOfUsers);
+        lockListViewHolder.deleteKey = row.findViewById(R.id.buttonDeleteKey);
+        lockListViewHolder.shareKey = row.findViewById(R.id.buttonSharkeKey);
+
+        } else {
+            row = convertView;
+            lockListViewHolder = (LockListViewHolder)row.getTag();
+        }
+
+
+
+        final ListOfLocks listOfLocks = getItem(position);
+        lockListViewHolder.lockName.setText(listOfLocks.lockName);
+        lockListViewHolder.theLockIsSharedWith.setText("the lock " + " lock ID" + "is share with: ");
+        ArrayList<String> listOfUsersWithKey = dataBaseHandler.getUsers();
+        ArrayAdapter adapter = new ArrayAdapter(context, android.R.layout.simple_spinner_item,
+                listOfUsersWithKey);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        lockListViewHolder.spinnerOfUsers.setAdapter(adapter);
+        row.setTag(lockListViewHolder);
+
+        //onClick delete user
+        //onClick share lockAccess
+
 
        // ListOfLocks listOfLocks = locksList.get(position);
        // textViewNameOfTheLock.setText((CharSequence) dataBaseHandler.getLocks());
         //spinner.setAdapter(Adapter adapter);
 
-        ArrayList<String> listOfUsersWithKey = dataBaseHandler.getUsers();
+        //ArrayList<String> listOfUsersWithKey = dataBaseHandler.getUsers();
 
-        ArrayAdapter adapter = new ArrayAdapter(context, android.R.layout.simple_spinner_item,
-                listOfUsersWithKey);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
+       // ArrayAdapter adapter = new ArrayAdapter(context, android.R.layout.simple_spinner_item,
+        //        listOfUsersWithKey);
+        //adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        //spinnerOfUsers.setAdapter(adapter);
 
-        //anonymous class onClickListener
-        buttonDelete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
-
-        return view;
+        return row;
     }
 
 }
