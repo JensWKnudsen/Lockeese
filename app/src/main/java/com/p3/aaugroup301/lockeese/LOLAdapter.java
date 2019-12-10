@@ -1,6 +1,7 @@
 package com.p3.aaugroup301.lockeese;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,14 +13,15 @@ import androidx.annotation.Nullable;
 
 public class LOLAdapter extends BaseAdapter {
 
-   private Context context;
-   public ArrayList<ListOfLocks> locksList;
+    private Context context;
+    public ArrayList<ListOfLocks> locksList;
+    DataBaseHandler dbhandler;
 
-   public LOLAdapter(Context context, ArrayList<ListOfLocks> locksList){
+    public LOLAdapter(Context context, ArrayList<ListOfLocks> locksList){
 
-       this.context = context;
-       this.locksList = locksList;
-   }
+        this.context = context;
+        this.locksList = locksList;
+    }
 
     @Override
     public int getCount() {
@@ -43,32 +45,34 @@ public class LOLAdapter extends BaseAdapter {
 
         View row;
         final LockListViewHolder lockListViewHolder;
-        final DataBaseHandler dataBaseHandler = new DataBaseHandler();
+        //Log.e("LOL Adapter", " getView array size " +  locksList.size());
 
         if (convertView == null) {
 
-        LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        row = layoutInflater.inflate(R.layout.list_of_locks_item, parent, false);
-        lockListViewHolder = new LockListViewHolder();
-        lockListViewHolder.lockName = row.findViewById(R.id.tVnameOfTheLock);
-        lockListViewHolder.theLockIsSharedWith = row.findViewById(R.id.tVLockIsSharedWith);
-        lockListViewHolder.spinnerOfUsers = row.findViewById(R.id.spinnerOfUsers);
-        lockListViewHolder.deleteKey = row.findViewById(R.id.buttonDeleteKey);
-        lockListViewHolder.shareKey = row.findViewById(R.id.buttonSharkeKey);
+            LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            row = layoutInflater.inflate(R.layout.list_of_locks_item, parent, false);
+            lockListViewHolder = new LockListViewHolder();
+            lockListViewHolder.lockName = row.findViewById(R.id.tVnameOfTheLock);
+            lockListViewHolder.theLockIsSharedWith = row.findViewById(R.id.tVLockIsSharedWith);
+            lockListViewHolder.spinnerOfUsers = row.findViewById(R.id.spinnerOfUsers);
+            lockListViewHolder.deleteKey = row.findViewById(R.id.buttonDeleteKey);
+            lockListViewHolder.shareKey = row.findViewById(R.id.buttonSharkeKey);
 
         } else {
             row = convertView;
             lockListViewHolder = (LockListViewHolder)row.getTag();
         }
 
+        Log.e("LOL Adapter", " getView - after check" );
 
 
         final ListOfLocks listOfLocks = getItem(position);
         lockListViewHolder.lockName.setText(listOfLocks.lockName);
-        lockListViewHolder.theLockIsSharedWith.setText("the lock " + " lock ID" + "is share with: ");
-        ArrayList<String> listOfUsersWithKey = dataBaseHandler.getUsers();
+        lockListViewHolder.theLockIsSharedWith.setText("The lock is shared with: ");
+        dbhandler = new DataBaseHandler();
+        ArrayList userList = dbhandler.getUsers(listOfLocks.lockId);
         ArrayAdapter adapter = new ArrayAdapter(context, android.R.layout.simple_spinner_item,
-                listOfUsersWithKey);
+                userList);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         lockListViewHolder.spinnerOfUsers.setAdapter(adapter);
         row.setTag(lockListViewHolder);
@@ -77,13 +81,13 @@ public class LOLAdapter extends BaseAdapter {
         //onClick share lockAccess
 
 
-       // ListOfLocks listOfLocks = locksList.get(position);
-       // textViewNameOfTheLock.setText((CharSequence) dataBaseHandler.getLocks());
+        // ListOfLocks listOfLocks = locksList.get(position);
+        // textViewNameOfTheLock.setText((CharSequence) dataBaseHandler.getLocks());
         //spinner.setAdapter(Adapter adapter);
 
         //ArrayList<String> listOfUsersWithKey = dataBaseHandler.getUsers();
 
-       // ArrayAdapter adapter = new ArrayAdapter(context, android.R.layout.simple_spinner_item,
+        // ArrayAdapter adapter = new ArrayAdapter(context, android.R.layout.simple_spinner_item,
         //        listOfUsersWithKey);
         //adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         //spinnerOfUsers.setAdapter(adapter);

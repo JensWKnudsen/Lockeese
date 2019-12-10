@@ -122,7 +122,7 @@ public class ListOfLocksActivity extends AppCompatActivity {
                 LOLAdapter lockListAdapter = new LOLAdapter(ListOfLocksActivity.this, listOflocksTheUserHas);
                 ListView listView1 = findViewById(R.id.dynamicListView);
                 listView1.setAdapter(lockListAdapter);
-                Log.e("SearchLocks", "Inside for loop " + listOflocksTheUserHas.size() );
+                Log.e("SearchLocks", " OnPostExecute --> Inside for loop " + listOflocksTheUserHas.get(0).usersOfLock );
 
             }
         }
