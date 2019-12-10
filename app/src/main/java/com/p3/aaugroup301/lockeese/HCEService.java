@@ -2,13 +2,14 @@ package com.p3.aaugroup301.lockeese;
 
 import android.nfc.cardemulation.HostApduService;
 import android.os.Bundle;
+import android.util.Log;
 
 //sending LockKey to NFC reader
 public class HCEService extends HostApduService {
     @Override
     public byte[] processCommandApdu(byte[] bytes, Bundle bundle) {
 
-
+        Log.d("NFCTest", "message from reader: " + bytes);
         // all communication should be encrypted
        //a) get request from NFC reader to send LockKey -> send the LockKey
         // b) LockKey is wrong -> mess 'the LockKey is incorrect'

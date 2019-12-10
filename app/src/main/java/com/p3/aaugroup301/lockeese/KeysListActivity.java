@@ -41,20 +41,42 @@ public class KeysListActivity extends AppCompatActivity {
 
             }
         });
+
+        Button LogOutButton = findViewById(R.id.logOut);
+        LogOutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view){
+
+                DataBaseHandler.setCurrentUserID(null);
+                DataBaseHandler.setCurrentUserName(null);
+
+                Context context = view.getContext();
+                Intent intent = new Intent(context, LoginActivity.class);
+                context.startActivity(intent);
+
+
+            }
+        });
+
+
+
         GetKeysAsyncTask getKeysAsyncTask = new GetKeysAsyncTask(context);
         getKeysAsyncTask.execute((Void) null);
         Log.e("SearchLocks", "After AsyncTask" );
     }
 
     public void getRemainingTime (KeysHashes keysHashes){
-        Timestamp expirationTime =  keysHashes.expirationDate;
-        long expirationDate = expirationTime.getSeconds();
-        Date expirationDateD = new Date(expirationDate);
+        Log.e("Expiration", "checking key");
+        Date expirationDate = keysHashes.expirationDate.toDate();;
         Date currentDate = new Date();
-//        if (currentDate.after(expirationDateD)) {
-//            //delete key
-//            dataBaseHandler.removeKey( String.valueOf(keysHashes.keyID),String.valueOf(keysHashes.LockID) );
-//        }
+        Log.e("Expiration", "current date: " + currentDate);
+        Log.e("Expiration", "expiration date: " + expirationDate);
+
+        if (currentDate.after(expirationDate)) {
+            //delete key
+            Log.e("Expiration", "key is expired");
+            dataBaseHandler.removeKey( String.valueOf(keysHashes.keyID),String.valueOf(keysHashes.LockID) );
+        }
 
     }
 
@@ -148,11 +170,14 @@ public class KeysListActivity extends AppCompatActivity {
 
             for(int i=0; i<=listOfKeys.size()-1; i++){
                 Log.e("SearchLocks", "Inside for loop " + listOfKeys.size() );
-                getRemainingTime( listOfKeys.get(i) );
+                if(listOfKeys.get(i).getAccessLevel() == 4){
+                    getRemainingTime( listOfKeys.get(i) );
+                }
                 Log.e("SearchLocks", "After AsyncTask after the for loop" );
             }
         }
     }
+
 }
 
 

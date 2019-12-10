@@ -55,6 +55,24 @@ public class DataBaseHandler {
     static String currentUserID;
     static String currentUserName;
 
+    public static String getCurrentUserID() {
+        return currentUserID;
+    }
+
+    public static void setCurrentUserID(String currentUserID) {
+        DataBaseHandler.currentUserID = currentUserID;
+    }
+
+    public static String getCurrentUserName() {
+        return currentUserName;
+    }
+
+    public static void setCurrentUserName(String currentUserName) {
+        DataBaseHandler.currentUserName = currentUserName;
+    }
+
+
+
     //Login
     public String login(String username, String password){
         Log.e("verify user","start");
@@ -190,8 +208,8 @@ public class DataBaseHandler {
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     for (QueryDocumentSnapshot document : task.getResult()) {
-                        Log.w("getUSers", document.get("Username").toString());
-                        listOfUsers.add(document.get("Username").toString());
+                        Log.w("getUSers", document.getString("Username"));
+                        listOfUsers.add(document.getString("Username"));
                     }
                 } else {
                     Log.w("getUsers", "Error getting documents.", task.getException());

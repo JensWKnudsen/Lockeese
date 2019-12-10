@@ -6,7 +6,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class ListAdapter extends BaseAdapter {
 
@@ -55,7 +57,14 @@ public class ListAdapter extends BaseAdapter {
         final KeysHashes keysHashes = getItem(position);
 
         keysListViewHolder.keyNameAndUser.setText(keysHashes.keyName );
-        keysListViewHolder.timer.setText("time left: " + keysHashes.expirationDate);
+        SimpleDateFormat dateFormat = new SimpleDateFormat( " E dd-M-yyyy HH:mm" );
+        Date expiration =  keysHashes.expirationDate.toDate();
+        if(keysHashes.getAccessLevel() == 4){
+            keysListViewHolder.timer.setText("expires: " +  dateFormat.format(expiration));
+        }else{
+            keysListViewHolder.timer.setText("Permanent");
+        }
+
         //create updateTimer method
         keysListViewHolder.accessLevel.setText("access level: " + keysHashes.accessLevel );
         keysListViewHolder.deleteButton.setOnClickListener( new View.OnClickListener() {

@@ -71,17 +71,6 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher, Com
         usernameView = findViewById( R.id.username );
         passwordView = findViewById( R.id.password );
         // Create a button handler and call the dialog box display method in it
-        Button aboutUsButton = findViewById( R.id.aboutUsButton );
-        aboutUsButton.
-                setOnClickListener( new View.OnClickListener() {
-
-                    @Override
-                    public void onClick(View v) {
-
-                        PopUpWindow popUpClass = new PopUpWindow();
-                        popUpClass.showPopupWindow( v );
-                    }
-                } );
 
 
         Button mEmailSignInButton = findViewById( R.id.login );
@@ -91,6 +80,34 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher, Com
                 attemptLogin();
             }
         } );
+
+        // Create a button handler and call the dialog box display method in it
+        Button aboutUsButton = findViewById( R.id.aboutUsButton );
+        aboutUsButton.
+                setOnClickListener( new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View v) {
+                        AlertDialog.Builder popUp = new AlertDialog.Builder(LoginActivity.this);
+                        popUp.setMessage(R.string.aboutUsText);
+                        popUp.setCancelable(false);
+                        popUp.setNegativeButton( "Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                finish();
+                                System.exit(0);
+                            }
+                        } );
+                        popUp.setPositiveButton(R.string.agreeButton, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+                        AlertDialog reg = popUp.create();
+                        reg.show();
+                    }
+                } );
     }
 
     private void attemptLogin() {
@@ -253,4 +270,11 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher, Com
         }
     }
 
+    @Override
+    public void onBackPressed(){
+        Intent a = new Intent(Intent.ACTION_MAIN);
+        a.addCategory(Intent.CATEGORY_HOME);
+        a.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(a);
+    }
 }
