@@ -29,6 +29,12 @@
 
     <!-- Strings about us pop-up -->
     <string name="aboutUsText">It is important to be aware of what personal data this app collects and how the data are used and
-    managed.</string>
+    managed.
+    What data we are asking for?
+    - we do not require any sensitive data like home address or first name only data like username and password which can be sensitive so you should not disclosed them to the third parties
+    Where is data stored?
+        -all necessary data required for proper functioning is stored on Firebase
+        How is data secured?
+    - when communicating within system data is encrypted </string>
     <string name="agreeButton">Agree</string>
 </resources>

@@ -1,10 +1,17 @@
 package com.p3.aaugroup301.lockeese;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.os.AsyncTask;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -12,12 +19,14 @@ import java.util.Date;
 
 public class ListAdapter extends BaseAdapter {
 
+
     public ArrayList<KeysHashes> listOfKeysHashes;
     private Context context;
 
     public ListAdapter(Context context, ArrayList<KeysHashes> listOfKeysHashes) {
         this.context = context;
         this.listOfKeysHashes = listOfKeysHashes;
+
     }
 
     @Override
@@ -36,7 +45,7 @@ public class ListAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(final int position, View convertView
+    public View getView(final int position, final View convertView
             , ViewGroup parent) {
         View row;
         final KeysListViewHolder keysListViewHolder;
@@ -59,6 +68,7 @@ public class ListAdapter extends BaseAdapter {
         keysListViewHolder.keyNameAndUser.setText(keysHashes.keyName );
         SimpleDateFormat dateFormat = new SimpleDateFormat( " E dd-M-yyyy HH:mm" );
         Date expiration =  keysHashes.expirationDate.toDate();
+        Button deleteKey = keysListViewHolder.deleteButton;
         if(keysHashes.getAccessLevel() == 4){
             keysListViewHolder.timer.setText("expires: " +  dateFormat.format(expiration));
         }else{
@@ -67,17 +77,113 @@ public class ListAdapter extends BaseAdapter {
 
         //create updateTimer method
         keysListViewHolder.accessLevel.setText("access level: " + keysHashes.accessLevel );
-        keysListViewHolder.deleteButton.setOnClickListener( new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // DBHandler remove key from this user list
-            }
-        } );
 
+       deleteKey.setOnClickListener( new MyOnClickListener(keysHashes,keysListViewHolder) {
+            } );
 
         return row;
     }
 
+
+  public  class DeleteKeysAsyncTask extends AsyncTask<Void, Void, String> {
+
+        Context context;
+       private ProgressDialog progressDialog;
+       ArrayList<KeysHashes> listOfKeys = new ArrayList<>();
+       private DataBaseHandler dataBaseHandler = new DataBaseHandler();
+       KeysListViewHolder keysListViewHolder;
+       KeysHashes keysHashes;
+
+       public DeleteKeysAsyncTask(Context context , KeysHashes keysHashes,KeysListViewHolder keysListViewHolder) {
+
+           this.context=context;
+           this.keysHashes=keysHashes;
+           this.keysListViewHolder = keysListViewHolder;
+       }
+
+       @Override
+       protected void onPreExecute() {
+
+           /*progressDialog = new ProgressDialog();
+           progressDialog.setTitle( "Deleting key" );
+           progressDialog.setMessage( "Please wait" );
+           progressDialog.show();*/
+       }
+
+       @Override
+       protected String doInBackground(Void... voids) {
+
+           // String result = "Something went wrong when searching";
+
+           synchronized (this) {
+               try {
+                //   Log.e( "KeyHashesName", "do in background: " + keysHashes.getKeyName() );
+                  listOfKeys = KeysListActivity.getListOfKeys();
+                           dataBaseHandler.removeKey(String.valueOf(keysHashes.keyID),String.valueOf( keysHashes.LockID ));
+                   Log.e( "asynctest", "list of keys is size:" + listOfKeys.size() );
+
+               } catch (Exception e) {
+                   e.printStackTrace();
+               }
+           }
+           return "Success";
+       }
+      private final Runnable runnable = new Runnable() {
+
+          @Override
+          public void run() {
+              notifyDataSetChanged();
+              KeysListActivity.GetKeysAsyncTask.execute( this);
+          }
+      };
+
+       @Override
+       protected void onPostExecute(String result) {
+           Toast.makeText( context,"Your key was deleted",Toast.LENGTH_LONG ).show();
+           runnable.run();
+          /* if (progressDialog.isShowing()) {
+               progressDialog.setMessage( "Success" );
+               progressDialog.dismiss();
+           }*/
+
+
+
+       }
+   }
+    class MyOnClickListener implements View.OnClickListener {
+
+        KeysHashes keysHashes ;
+        KeysListViewHolder keysListViewHolder;
+
+        MyOnClickListener(KeysHashes keysHashes, KeysListViewHolder keysListViewHolder) {
+            this.keysHashes = keysHashes;
+            this.keysListViewHolder = keysListViewHolder;
+        }
+
+        @Override
+        public void onClick(View arg0) {
+            final AlertDialog.Builder deleteKey = new AlertDialog.Builder(keysListViewHolder.deleteButton.getContext());
+            deleteKey.setMessage("Are you sure you want to delete this key?");
+            deleteKey.setCancelable(false);
+            deleteKey.setNegativeButton( "No", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            } );
+            final DeleteKeysAsyncTask deleteKeysAsyncTask= new DeleteKeysAsyncTask( context, keysHashes,keysListViewHolder );
+
+            deleteKey.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    deleteKeysAsyncTask.execute( (Void)null);
+                }
+            });
+            AlertDialog reg = deleteKey.create();
+            reg.show();
+        }
+
+    }
 
 }
 

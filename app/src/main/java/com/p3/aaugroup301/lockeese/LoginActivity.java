@@ -161,7 +161,7 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher, Com
 
         else {
             Toast.makeText(getApplicationContext(), "Password must be at least 8 " +
-                    "characters long and have a digit", duration).show();
+                    "characters long and contain a digit and one special character", duration).show();
             isFine = false;
         }
         Log.e("checkP", "before return " + isFine);
@@ -270,11 +270,4 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher, Com
         }
     }
 
-    @Override
-    public void onBackPressed(){
-        Intent a = new Intent(Intent.ACTION_MAIN);
-        a.addCategory(Intent.CATEGORY_HOME);
-        a.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(a);
-    }
 }

@@ -78,6 +78,7 @@ public class ListOfLocksActivity extends AppCompatActivity {
 
          class GetListOfLocksAsyncTask extends AsyncTask<Void, Void, String> {
 
+
             Context context;
             private ProgressDialog progressDialog;
             ArrayList<ListOfLocks> listOflocksTheUserHas = new ArrayList<>();
