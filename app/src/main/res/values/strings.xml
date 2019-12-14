@@ -37,4 +37,10 @@
         How is data secured?
     - when communicating within system data is encrypted </string>
     <string name="agreeButton">Agree</string>
+
+    <array name="accessLevels">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </array>
 </resources>

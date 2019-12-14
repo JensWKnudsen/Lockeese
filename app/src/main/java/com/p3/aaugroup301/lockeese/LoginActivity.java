@@ -92,10 +92,10 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher, Com
                         popUp.setMessage(R.string.aboutUsText);
                         popUp.setCancelable(false);
                         popUp.setNegativeButton( "Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                finish();
-                                System.exit(0);
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        finish();
+                                        System.exit(0);
                             }
                         } );
                         popUp.setPositiveButton(R.string.agreeButton, new DialogInterface.OnClickListener() {
@@ -131,6 +131,7 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher, Com
             usernameView.setError(getString(R.string.error_field_required));
             focusView = usernameView;
             cancel = true;
+
         }
 
         if (cancel) {

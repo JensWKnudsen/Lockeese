@@ -2,9 +2,13 @@ package com.p3.aaugroup301.lockeese;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.solver.ArrayLinkedVariables;
+import androidx.fragment.app.DialogFragment;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -12,6 +16,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -22,15 +28,14 @@ public class ListOfLocksActivity extends AppCompatActivity {
 
     List<ListOfLocks> listOfLocksList;
     ListView listViewLOL;
-
+    LockListViewHolder lockListViewHolder = new LockListViewHolder();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        Button buttonGoToKeysActivity = findViewById(R.id.buttonGoToKeysActivity);
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_of_locks);
+        Button buttonGoToKeysActivity = findViewById(R.id.buttonGoToKeysActivity);
 
         listOfLocksList = new ArrayList<>();
         listViewLOL = findViewById(R.id.dynamicListView);
@@ -41,17 +46,15 @@ public class ListOfLocksActivity extends AppCompatActivity {
         getListOfLocksAsyncTask.execute((Void) null);
         Log.e("SearchLocks", "After AsyncTask" );
 
-      /**
         buttonGoToKeysActivity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Context context = view.getContext();
-                Intent intent = new Intent(context, ListOfLocksActivity.class);
-                context.startActivity(intent);
+                onBackPressed();
+                //Intent intent = new Intent(view.getContext(), KeysListActivity.class);
+                //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                //startActivity(intent);
             }
         });
-
-       */
     }
 
        /**
@@ -92,7 +95,7 @@ public class ListOfLocksActivity extends AppCompatActivity {
             protected void onPreExecute() {
 
                 progressDialog = new ProgressDialog(context);
-                progressDialog.setTitle("Loading Your keys");
+                progressDialog.setTitle("Loading Your locks");
                 progressDialog.setMessage("Please wait");
                 progressDialog.show();
             }
@@ -128,3 +131,4 @@ public class ListOfLocksActivity extends AppCompatActivity {
             }
         }
 }
+

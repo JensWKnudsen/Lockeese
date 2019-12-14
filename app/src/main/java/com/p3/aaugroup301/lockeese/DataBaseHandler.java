@@ -1,6 +1,7 @@
 package com.p3.aaugroup301.lockeese;
 
 
+import android.os.Build;
 import android.util.Log;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -17,15 +18,20 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+
+import static android.content.ContentValues.TAG;
 
 public class DataBaseHandler {
 
@@ -50,6 +56,8 @@ public class DataBaseHandler {
     private static ArrayBlockingQueue<ArrayList<ArrayList>> ArrayArrayBlockingQueue = new ArrayBlockingQueue<>(1);
     private static ArrayBlockingQueue<ArrayList<KeysHashes>> ArrayHashesBlockingQueue = new ArrayBlockingQueue<>(1);
     private static ArrayBlockingQueue<ArrayList<ListOfLocks>> ArrayListOfLocksBlockingQueue = new ArrayBlockingQueue<>(1);
+    private static ArrayBlockingQueue<String> UserExistsBlockingQueue = new ArrayBlockingQueue<>(1);
+    private static ArrayBlockingQueue<String> SharekeyBlockingQueue = new ArrayBlockingQueue<>(1);
 
 
     static String currentUserID;
@@ -220,6 +228,63 @@ public class DataBaseHandler {
         return listOfUsers;
     }
 
+    public ArrayList<String> userExists(final String inputUsername) {
+//        Query userExistsQuery = db.collection(USERS_COLLECTION);
+//        final ArrayList<String> exists = new ArrayList<>();
+//
+//        userExistsQuery.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+//            @Override
+//            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+//                if (task.isSuccessful()) {
+//                    for (QueryDocumentSnapshot document : task.getResult()) {
+//                        String name = document.getString("Username");
+//                        if (name.equalsIgnoreCase(inputUsername)) {
+//                            Log.w("checkUserExists", "print user name " + document.getString("Username") + "=" + inputUsername);
+//                            exists.add(document.getString("Username"));
+//                        }
+//                    }
+//                }
+//                else {
+//                    Log.w("User exists", "Error getting documents.", task.getException());
+//                }
+//            }
+//        });
+//        return exists;
+
+        ArrayList<String> listOfUsers = new ArrayList<>();
+        UserExistsBlockingQueue.clear();
+        db.collection(USERS_COLLECTION)
+                .whereEqualTo("Username", inputUsername)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.w("checkUserExists", "print user name " + document.getString("Username") + "=" + inputUsername);
+                                //tOfUsers.add(document.getString("Username"));
+                                try {
+                                    UserExistsBlockingQueue.put(document.getString("Username"));
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
+
+        try {
+            listOfUsers.add(UserExistsBlockingQueue.take());
+        }catch(InterruptedException e) {
+        }
+
+        return listOfUsers;
+
+    }
+
+
     public ArrayList<String> getUsers(String LockID) {
         Log.w("getUsersBylocks", "Checking in new get users method" +LockID);
 
@@ -244,19 +309,23 @@ public class DataBaseHandler {
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public void shareKey(String username, String lockID, String lockName, String accessLevel){
-        StringBlockingQueue.clear();
+        SharekeyBlockingQueue.clear();
         String userSharedWith;
 
         Query queryUsername = db.collection(USERS_COLLECTION).whereEqualTo(USERNAME, username);
+        Log.w("shareKey", "print user name " +username );
+
 
         queryUsername.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult().getDocuments().get(0);
+                    Log.w("shareKey", "print document.getId " +document.getId() );
                     try {
-                        StringBlockingQueue.put(document.getId());
+                        SharekeyBlockingQueue.put(document.getId());
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -267,7 +336,7 @@ public class DataBaseHandler {
             }
         });
         try {
-            userSharedWith = StringBlockingQueue.take();
+            userSharedWith = SharekeyBlockingQueue.take();
 
             Map<String, Object> lockData = new HashMap<>();
             db.collection(LOCKS_COLLECTION).document(lockID).collection(USERS_COLLECTION).document(userSharedWith).set(lockData);
@@ -277,12 +346,15 @@ public class DataBaseHandler {
             String hashKeyInput = userSharedWith + currentDate + lockID;
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] encodedHash = digest.digest(hashKeyInput.getBytes(StandardCharsets.UTF_8));
+            String encodedString = Base64.getEncoder().encodeToString(encodedHash);
+
 
             Map<String, Object> keyData = new HashMap<>();
             keyData.put(NAME_OF_KEY, lockName + " (" + currentUserName + ")");
             keyData.put(LOCKID, lockID);
-            keyData.put(ACCESS_LEVEL, accessLevel);
-            keyData.put(HASH, encodedHash);
+            keyData.put(ACCESS_LEVEL, Integer.parseInt(accessLevel));
+            keyData.put(EXPIRATION, Timestamp.now());
+            keyData.put(HASH, encodedString);
             db.collection(USERS_COLLECTION).document(userSharedWith).collection(KEYS_COLLECTION).add(keyData);
 
         } catch (InterruptedException | NoSuchAlgorithmException e) {
@@ -300,7 +372,7 @@ public class DataBaseHandler {
                     @Override
                     public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                         for (final DocumentSnapshot documentLocks : queryDocumentSnapshots.getDocuments()) {
-                            final ListOfLocks listOfLocks = new ListOfLocks(documentLocks.getString("LockName"), currentUserID, currentUserName, documentLocks.getString("LockID"));
+                            final ListOfLocks listOfLocks = new ListOfLocks(documentLocks.getString("Lockname"), currentUserID, currentUserName, documentLocks.getString("LockID"));
                             listOfIDs.add(listOfLocks);
                         }
                         try {
@@ -323,3 +395,5 @@ public class DataBaseHandler {
 
 
 }
+
+
