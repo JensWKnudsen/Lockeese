@@ -63,35 +63,4 @@
 
     </RadioGroup>
 
-    <Button
-        android:id="@+id/button_cancel_sharing"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/accessLevelRadioGroup"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="39dp"
-        android:layout_marginTop="7dp"
-        android:layout_marginBottom="20dp"
-        android:gravity="center_horizontal"
-        android:text="Cancel"
-        android:textAllCaps="false"
-        android:textSize="20dp" />
-
-    <Button
-        android:id="@+id/button_share_the_key_with"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/accessLevelRadioGroup"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginStart="11dp"
-        android:layout_marginTop="7dp"
-        android:layout_marginEnd="19dp"
-        android:layout_marginRight="19dp"
-        android:layout_marginBottom="20dp"
-        android:gravity="center_horizontal"
-        android:text="Share the key"
-        android:textAllCaps="false"
-        android:textSize="20dp" />
-
 </RelativeLayout>

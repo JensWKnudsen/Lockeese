@@ -338,15 +338,21 @@ public class DataBaseHandler {
         try {
             userSharedWith = SharekeyBlockingQueue.take();
 
-            Map<String, Object> lockData = new HashMap<>();
-            db.collection(LOCKS_COLLECTION).document(lockID).collection(USERS_COLLECTION).document(userSharedWith).set(lockData);
-
-
             Date currentDate = new Date(  );
             String hashKeyInput = userSharedWith + currentDate + lockID;
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] encodedHash = digest.digest(hashKeyInput.getBytes(StandardCharsets.UTF_8));
             String encodedString = Base64.getEncoder().encodeToString(encodedHash);
+
+            Map<String, Object> lockData = new HashMap<>();
+            lockData.put(ACCESS_LEVEL, Integer.parseInt(accessLevel));
+            lockData.put(KEY,encodedString);
+            lockData.put(USERID, userSharedWith);
+            lockData.put(USERNAME, username);
+            db.collection(LOCKS_COLLECTION).document(lockID).collection(USERSOFLOCK_COLLECTION).document(userSharedWith).set(lockData);
+
+
+
 
 
             Map<String, Object> keyData = new HashMap<>();
