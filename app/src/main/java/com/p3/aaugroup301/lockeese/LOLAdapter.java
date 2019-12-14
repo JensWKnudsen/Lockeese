@@ -125,8 +125,8 @@ public class LOLAdapter extends BaseAdapter {
         final EditText usernameToSHareLockEditText = alertDialogView.findViewById(R.id.userNameToShareKeyWith);
         final TextView selectAccessLevel = alertDialogView.findViewById(R.id.select_access_level);
         final RadioGroup accessLevelRadioGroup = alertDialogView.findViewById(R.id.accessLevelRadioGroup);
-        final Button cancelSharing = alertDialogView.findViewById(R.id.button_cancel_sharing);
-        final Button shareTheKeyWith = alertDialogView.findViewById(R.id.button_share_the_key_with);
+        //final Button cancelSharing = alertDialogView.findViewById(R.id.button_cancel_sharing);
+        //final Button shareTheKeyWith = alertDialogView.findViewById(R.id.button_share_the_key_with);
         Log.e("alertDialog", "before AlertDialog builder ");
 
         new AlertDialog.Builder(context).setView(alertDialogView)

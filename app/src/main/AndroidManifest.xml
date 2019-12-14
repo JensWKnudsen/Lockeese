@@ -5,9 +5,7 @@
     <uses-feature
         android:name="android.hardware.nfc"
         android:required="true" />
-    <uses-feature
-        android:name="FEATURE_NFC_HOST_CARD_EMULATION"
-        android:required="true" />
+
 
     <uses-permission android:name="android.permission.NFC" />
 
@@ -18,14 +16,20 @@
         android:roundIcon="@mipmap/ic_llogo_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Beam">
-            <intent-filter>
-                <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <data android:mimeType="application/com.p3.aaugroup301.mybeamapplication"/>
 
+        <service
+            android:name=".HCEService"
+            android:exported="true"
+            android:permission="android.permission.BIND_NFC_SERVICE">
+            <intent-filter>
+                <action android:name="android.nfc.cardemulation.action.HOST_APDU_SERVICE" />
             </intent-filter>
-        </activity>
+
+            <meta-data
+                android:name="android.nfc.cardemulation.host_apdu_service"
+                android:resource="@xml/apduservice" />
+        </service>
+
         <activity
             android:name=".KeysListActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
@@ -40,18 +44,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity"></activity>
-        <service
-            android:name=".HCEService"
-            android:exported="true"
-            android:permission="android.permission.BIND_NFC_SERVICE">
-            <intent-filter>
-                <action android:name="android.nfc.cardemulation.action.HOST_APDU_SERVICE" />
-            </intent-filter>
 
-            <meta-data
-                android:name="android.nfc.cardemulation.host_apdu_service"
-                android:resource="@xml/apduservice" />
-        </service>
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />

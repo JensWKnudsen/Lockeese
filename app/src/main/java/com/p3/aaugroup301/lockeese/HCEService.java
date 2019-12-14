@@ -9,13 +9,14 @@ import java.util.Arrays;
 //sending LockKey to NFC reader
 public class HCEService extends HostApduService {
 
-    String AID = "F2076423058596";
+    String AID = "A0000002471001";
+
     @Override
     public byte[] processCommandApdu(byte[] bytes, Bundle bundle) {
 
-
+        Log.e("NFC","success");
         if (Arrays.copyOfRange(bytes,10,24) == AID.getBytes())  {
-            return KeysListActivity.getListOfKeys().get(0).getKeyHash().getBytes();
+            return KeysListActivity.getListOfKeys().get(1).getKeyHash().getBytes();
         } else {
             return "Error".getBytes();
         }
