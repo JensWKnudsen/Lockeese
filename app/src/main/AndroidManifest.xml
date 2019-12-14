@@ -18,11 +18,20 @@
         android:roundIcon="@mipmap/ic_llogo_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".KeysListActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"></activity>
-        <activity android:name=".ListOfLocksActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-           ></activity>
+        <activity android:name=".Beam">
+            <intent-filter>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="application/com.p3.aaugroup301.mybeamapplication"/>
+
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".KeysListActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name=".ListOfLocksActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
