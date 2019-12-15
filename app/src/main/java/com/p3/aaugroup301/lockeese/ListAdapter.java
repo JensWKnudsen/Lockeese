@@ -4,7 +4,9 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +18,8 @@ import android.widget.Toast;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+
+import static androidx.core.content.ContextCompat.startActivity;
 
 public class ListAdapter extends BaseAdapter {
 
@@ -104,10 +108,6 @@ public class ListAdapter extends BaseAdapter {
        @Override
        protected void onPreExecute() {
 
-           /*progressDialog = new ProgressDialog();
-           progressDialog.setTitle( "Deleting key" );
-           progressDialog.setMessage( "Please wait" );
-           progressDialog.show();*/
        }
 
        @Override
@@ -128,25 +128,16 @@ public class ListAdapter extends BaseAdapter {
            }
            return "Success";
        }
-      private final Runnable runnable = new Runnable() {
 
-          @Override
-          public void run() {
-              notifyDataSetChanged();
-              KeysListActivity.GetKeysAsyncTask.execute( this);
-          }
-      };
 
        @Override
        protected void onPostExecute(String result) {
            Toast.makeText( context,"Your key was deleted",Toast.LENGTH_LONG ).show();
-           runnable.run();
-          /* if (progressDialog.isShowing()) {
-               progressDialog.setMessage( "Success" );
-               progressDialog.dismiss();
-           }*/
+          // runnable.run();
 
-
+           Intent intent = new Intent(context, KeysListActivity.class);
+           intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+           startActivity(context, intent, Bundle.EMPTY);
 
        }
    }

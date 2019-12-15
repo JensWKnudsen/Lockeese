@@ -2,34 +2,34 @@ package com.p3.aaugroup301.lockeese;
 
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.view.menu.ShowableListMenu;
+
+import static androidx.core.content.ContextCompat.startActivity;
+
 
 public class LOLAdapter extends BaseAdapter {
 
@@ -121,6 +121,16 @@ public class LOLAdapter extends BaseAdapter {
             @Override
             public void onClick(View view) {
                 alertShareKeyDialog(context, listOfLocks);
+            }
+        } );
+
+        lockListViewHolder.deleteKey.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+               // DeleteKeyAsyncTask deleteKeyAsyncTask = new DeleteKeyAsyncTask(context,userList);
+               // ListAdapter listAdapter = new ListAdapter(context,ArrayList<KeyHashes> );
+
+
             }
         } );
 
@@ -234,6 +244,9 @@ class CheckUserAsync extends AsyncTask<Void, Void, Boolean> {
         } else {
             showToast("User does not exists");
         }
+        Intent intent = new Intent(context, ListOfLocksActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(context, intent, Bundle.EMPTY);
     }
 
     private void showToast(String message){
@@ -242,4 +255,56 @@ class CheckUserAsync extends AsyncTask<Void, Void, Boolean> {
     }
 }
 
+  class DeleteKeyAsyncTask extends AsyncTask<Void, Void, String> {
+
+    Context context;
+    private ProgressDialog progressDialog;
+    ArrayList<KeysHashes> userList = new ArrayList<>();
+    private DataBaseHandler dataBaseHandler = new DataBaseHandler();
+    KeysListViewHolder keysListViewHolder;
+    KeysHashes keysHashes;
+
+    public DeleteKeyAsyncTask(Context context , KeysHashes keysHashes,KeysListViewHolder keysListViewHolder) {
+
+        this.context=context;
+        this.keysHashes=keysHashes;
+        this.keysListViewHolder = keysListViewHolder;
+    }
+
+    @Override
+    protected void onPreExecute() {
+
+    }
+
+    @Override
+    protected String doInBackground(Void... voids) {
+
+        // String result = "Something went wrong when searching";
+
+        synchronized (this) {
+            try {
+                //   Log.e( "KeyHashesName", "do in background: " + keysHashes.getKeyName() );
+                userList = KeysListActivity.getListOfKeys();
+                dataBaseHandler.removeKey(String.valueOf(keysHashes.keyID),String.valueOf( keysHashes.LockID ));
+                Log.e( "asynctest", "list of keys is size:" + userList.size() );
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return "Success";
+    }
+
+
+    @Override
+    protected void onPostExecute(String result) {
+        Toast.makeText( context,"Users key was deleted",Toast.LENGTH_LONG ).show();
+        // runnable.run();
+
+        Intent intent = new Intent(context, ListOfLocksActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(context, intent, Bundle.EMPTY);
+
+    }
+}
 
