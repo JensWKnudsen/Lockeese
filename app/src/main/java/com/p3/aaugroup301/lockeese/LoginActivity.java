@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.Html;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -90,7 +91,7 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher, Com
                     @Override
                     public void onClick(View v) {
                         AlertDialog.Builder popUp = new AlertDialog.Builder(LoginActivity.this);
-                        popUp.setMessage(R.string.aboutUsText);
+                        popUp.setMessage(Html.fromHtml(getString(R.string.aboutUsText)));
                         popUp.setCancelable(false);
                         popUp.setNegativeButton( "Cancel", new DialogInterface.OnClickListener() {
                                     @Override

@@ -21,6 +21,7 @@
         android:background="#1B0C7C"
         android:ems="10"
         android:hint="Password"
+        android:fontFamily="@font/asar"
         android:inputType="textPassword"
         android:textColor="@color/colorWhite"
         android:textColorHint="@color/colorWhite"
@@ -36,12 +37,24 @@
         android:layout_marginEnd="32dp"
         android:background="#1B0C7C"
         android:text="Login"
+        android:fontFamily="@font/asar"
         android:textColor="@color/colorWhite"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/password" />
     <!--android:onClick=""-->
 
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="225dp"
+        android:layout_height="202dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="48dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@mipmap/ic_logo_foreground" />
 
     <Button
         android:id="@+id/aboutUsButton"
@@ -65,6 +78,7 @@
         android:layout_marginTop="9dp"
         android:buttonTint="@color/colorPrimary"
         android:text="Remeber Me"
+        android:fontFamily="@font/asar"
         app:layout_constraintBottom_toTopOf="@+id/login"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/password" />
@@ -77,11 +91,12 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="3dp"
         android:background="@color/colorWhite"
-        android:text="Forgot password?"
+        android:fontFamily="@font/asar"
+        android:text="Reset credentials?"
         app:layout_constraintBottom_toTopOf="@+id/login"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/password"
-        app:layout_constraintVertical_bias="0.508" />
+        app:layout_constraintVertical_bias="0.0" />
 
     <EditText
         android:id="@+id/username"
@@ -92,6 +107,7 @@
         android:background="#1B0C7C"
         android:ems="10"
         android:hint="Username"
+        android:fontFamily="@font/asar"
         android:inputType="textPersonName"
         android:textColor="@color/colorWhite"
         android:textColorHint="@color/colorWhite"

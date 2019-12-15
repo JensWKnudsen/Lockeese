@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Lockeese</string>
     <string name="servicedesc">The key is read by Lock</string>
@@ -26,16 +27,18 @@
     <!-- Strings for key list screen -->
 
     <string name="KeyIconImage">key</string>
-
+    <string name="tab">\u0009</string>
     <!-- Strings about us pop-up -->
-    <string name="aboutUsText">It is important to be aware of what personal data this app collects and how the data are used and
-    managed.
-    What data we are asking for?
-    - we do not require any sensitive data like home address or first name only data like username and password which can be sensitive so you should not disclosed them to the third parties
-    Where is data stored?
+    <string name="aboutUsText"><![CDATA[It is important to be aware of what personal data this app collects and how the data are used and
+    managed. We respect yours <i>right to be forgotten</i> what means you can request us to delete your data.
+    <br><ul><b>What data we are asking for?</b></ul></br>
+    - we do require only username and password which can be sensitive so you should not disclosed them to the third parties, remember you can always reset your credentials if
+        you are afraid they have been compromised
+       <ul><b>Where is data stored?</b></ul>
         -all necessary data required for proper functioning is stored on Firebase
-        How is data secured?
-    - when communicating within system data is encrypted </string>
+        <ul><b>How is data secured?</b></ul>
+    - when communicating within system data is encrypted]]>
+    </string>
     <string name="agreeButton">Agree</string>
 
     <array name="accessLevels">

@@ -89,7 +89,7 @@ public class ListAdapter extends BaseAdapter {
     }
 
 
-  public  class DeleteKeysAsyncTask extends AsyncTask<Void, Void, String> {
+  public class DeleteKeysAsyncTask extends AsyncTask<Void, Void, String> {
 
         Context context;
        private ProgressDialog progressDialog;
@@ -98,7 +98,7 @@ public class ListAdapter extends BaseAdapter {
        KeysListViewHolder keysListViewHolder;
        KeysHashes keysHashes;
 
-       public DeleteKeysAsyncTask(Context context , KeysHashes keysHashes,KeysListViewHolder keysListViewHolder) {
+       public DeleteKeysAsyncTask(Context context , KeysHashes keysHashes, KeysListViewHolder keysListViewHolder) {
 
            this.context=context;
            this.keysHashes=keysHashes;
