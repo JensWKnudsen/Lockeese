@@ -11,8 +11,8 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginStart="47dp"
-        android:layout_marginTop="56dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="1dp"
         android:hint="Enter user name"
         android:inputType="text" />
 
@@ -22,7 +22,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/userNameToShareKeyWith"
+        android:layout_alignParentLeft="true"
         android:layout_centerHorizontal="true"
+        android:layout_marginLeft="30dp"
         android:layout_marginTop="5dp"
         android:text="Select a access level"
         android:textSize="20dp" />
@@ -32,8 +34,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/select_access_level"
-        android:layout_alignParentLeft="false"
+        android:layout_alignParentLeft="true"
         android:layout_centerHorizontal="true"
+        android:layout_marginLeft="40dp"
         android:layout_marginTop="5dp">
 
 

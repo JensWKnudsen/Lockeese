@@ -6,7 +6,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 public class LockListViewHolder {
-    EditText lockName;
+    TextView lockName;
     TextView theLockIsSharedWith;
     Spinner spinnerOfUsers;
     Button deleteKey;

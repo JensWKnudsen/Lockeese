@@ -3,6 +3,7 @@ package com.p3.aaugroup301.lockeese;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
+import android.app.Application;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -108,6 +109,7 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher, Com
                         reg.show();
                     }
                 } );
+
     }
 
     private void attemptLogin() {
@@ -270,6 +272,14 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher, Com
                 }
             }
         }
+    }
+
+    @Override
+    public void onBackPressed(){
+        Intent a = new Intent(Intent.ACTION_MAIN);
+        a.addCategory(Intent.CATEGORY_HOME);
+        a.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(a);
     }
 
 }

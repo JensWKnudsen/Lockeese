@@ -1,21 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
 
-
-    <EditText
+    <TextView
         android:id="@+id/tVnameOfTheLock"
+        style="@android:style/Widget.Material.TextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginStart="-1dp"
-        android:layout_marginTop="72dp"
+        android:layout_marginStart="1dp"
+        android:layout_marginTop="10dp"
         android:backgroundTint="#5DB6E9"
         android:fontFamily="@font/asar"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:textColor="@color/design_default_color_primary_dark"
         android:textSize="22sp" />
 
     <TextView
@@ -24,28 +27,29 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="0dp"
-        android:layout_marginTop="140dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="60dp"
         android:fontFamily="@font/asar"
-        android:text="Lock is shared with:"
+        android:text="Lock is Shared with  "
         android:textSize="20sp" />
 
     <Spinner
         android:id="@+id/spinnerOfUsers"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="132dp"
+        android:layout_height="35dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="140dp"
-        android:layout_marginEnd="95dp" />
+        android:layout_marginTop="60dp"
+        android:layout_marginEnd="6dp" />
 
     <Button
         android:id="@+id/buttonDeleteKey"
         android:layout_width="36dp"
         android:layout_height="46dp"
+        android:layout_alignParentEnd="true"
         android:layout_marginStart="300dp"
-        android:layout_marginTop="220dp"
-        android:layout_marginEnd="23dp"
+        android:layout_marginTop="100dp"
+        android:layout_marginRight="6dp"
         android:background="@drawable/ic_delete"
         android:fontFamily="@font/asar" />
 
@@ -56,8 +60,18 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="219dp"
+        android:layout_marginTop="100dp"
         android:fontFamily="@font/asar"
-        android:text="Share Key" />
+        android:text="Grant Access to another user" />
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="-15dp"
+        android:layout_marginTop="180dp"
+        android:background="?android:attr/listDivider" />
 
 </RelativeLayout>

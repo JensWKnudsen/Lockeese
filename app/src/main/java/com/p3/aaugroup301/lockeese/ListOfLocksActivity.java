@@ -50,9 +50,9 @@ public class ListOfLocksActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 onBackPressed();
-                //Intent intent = new Intent(view.getContext(), KeysListActivity.class);
-                //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                //startActivity(intent);
+                Intent intent = new Intent(view.getContext(), KeysListActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
             }
         });
     }

@@ -4,12 +4,15 @@ import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -81,21 +84,35 @@ public class LOLAdapter extends BaseAdapter {
         }
 
 
-
-
         final ListOfLocks listOfLocks = getItem(position);
 
         lockListViewHolder.lockName.setText(listOfLocks.lockName);
+        //lockListViewHolder.lockName.setBackgroundColor(Color.GRAY);
         lockListViewHolder.theLockIsSharedWith.setText("The lock is shared with: ");
         dbhandler = new DataBaseHandler();
-        ArrayList userList = dbhandler.getUsers(listOfLocks.lockId);
+        final ArrayList userList = dbhandler.getUsers(listOfLocks.lockId);
+        ArrayList tempUserList = userList;
+        tempUserList.add("Select a User");
 
-
-        ArrayAdapter adapter = new ArrayAdapter(context, android.R.layout.simple_spinner_item,
-                userList);
+        final ArrayAdapter adapter = new ArrayAdapter(context, android.R.layout.simple_spinner_item, tempUserList);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         lockListViewHolder.spinnerOfUsers.setAdapter(adapter);
         row.setTag(lockListViewHolder);
+        Log.e("LOL Adapter", " before spinner code array size " +  locksList.size());
+
+        lockListViewHolder.spinnerOfUsers.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                Log.e("LOL Adapter", " after spinner code declaration array size " +  locksList.size());
+                adapterView.getItemAtPosition(i).toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
 
         //onClick delete user
         //onClick share lockAccess
@@ -125,16 +142,21 @@ public class LOLAdapter extends BaseAdapter {
         final EditText usernameToSHareLockEditText = alertDialogView.findViewById(R.id.userNameToShareKeyWith);
         final TextView selectAccessLevel = alertDialogView.findViewById(R.id.select_access_level);
         final RadioGroup accessLevelRadioGroup = alertDialogView.findViewById(R.id.accessLevelRadioGroup);
-        //final Button cancelSharing = alertDialogView.findViewById(R.id.button_cancel_sharing);
-        //final Button shareTheKeyWith = alertDialogView.findViewById(R.id.button_share_the_key_with);
+
         Log.e("alertDialog", "before AlertDialog builder ");
 
+        TextView textView = new TextView(context);
+        textView.setText("Grant an Access");
+        textView.setPadding(20, 30, 20, 30);
+        textView.setTextSize(20F);
+        textView.setBackgroundColor(Color.BLUE);
+        textView.setTextColor(Color.WHITE);
+
         new AlertDialog.Builder(context).setView(alertDialogView)
-                .setTitle("Grant an access")
+                .setCustomTitle(textView)
                 .setPositiveButton("Share the key", new DialogInterface.OnClickListener() {
                     @TargetApi(11)
                     public void onClick(DialogInterface dialog, int id) {
-
                         // find the radiobutton by returned id
                         int selectedId = accessLevelRadioGroup.getCheckedRadioButtonId();
                         RadioButton selectedRadioButton = alertDialogView.findViewById(selectedId);

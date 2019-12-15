@@ -22,6 +22,7 @@ public class HCEService extends HostApduService {
         }
 
 
+
         //Log.d("NFCTest", "message from reader: " + bytes);
         // all communication should be encrypted
        //a) get request from NFC reader to send LockKey -> send the LockKey
