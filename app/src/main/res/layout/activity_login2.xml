@@ -35,7 +35,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="112dp"
         android:layout_marginEnd="32dp"
-        android:background="#1B0C7C"
+        android:background="@drawable/button_background"
         android:text="Login"
         android:fontFamily="@font/asar"
         android:textColor="@color/colorWhite"

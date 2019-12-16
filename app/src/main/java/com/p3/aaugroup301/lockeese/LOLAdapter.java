@@ -23,6 +23,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -92,6 +93,9 @@ public class LOLAdapter extends BaseAdapter {
         dbhandler = new DataBaseHandler();
         final ArrayList userList = dbhandler.getUsers(listOfLocks.lockId);
         ArrayList tempUserList = userList;
+
+        Log.e("LOL Adapter", " before spinner code array size of users " +  tempUserList.size());
+
         tempUserList.add("Select a User");
 
         final ArrayAdapter adapter = new ArrayAdapter(context, android.R.layout.simple_spinner_item, tempUserList);
@@ -99,20 +103,6 @@ public class LOLAdapter extends BaseAdapter {
         lockListViewHolder.spinnerOfUsers.setAdapter(adapter);
         row.setTag(lockListViewHolder);
         Log.e("LOL Adapter", " before spinner code array size " +  locksList.size());
-
-        lockListViewHolder.spinnerOfUsers.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                Log.e("LOL Adapter", " after spinner code declaration array size " +  locksList.size());
-                adapterView.getItemAtPosition(i).toString();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-
 
         //onClick delete user
         //onClick share lockAccess
@@ -127,18 +117,33 @@ public class LOLAdapter extends BaseAdapter {
         lockListViewHolder.deleteKey.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-               // DeleteKeyAsyncTask deleteKeyAsyncTask = new DeleteKeyAsyncTask(context,userList);
-               // ListAdapter listAdapter = new ListAdapter(context,ArrayList<KeyHashes> );
-
+                    final AlertDialog.Builder deleteKeyAlertDialog = new AlertDialog.Builder(lockListViewHolder.deleteKey.getContext());
+                    deleteKeyAlertDialog.setMessage("Are you sure you want to delete this key from user " +
+                            lockListViewHolder.spinnerOfUsers.getSelectedItem().toString() + "?");
+                    deleteKeyAlertDialog.setCancelable(false);
+                    deleteKeyAlertDialog.setNegativeButton( "No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    } );
+                    deleteKeyAlertDialog.setPositiveButton("Yes",  new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String userName = lockListViewHolder.spinnerOfUsers.getSelectedItem().toString();
+                            DeleteKeyAsyncTask deleteKeyAsyncTask = new DeleteKeyAsyncTask(context, userName, listOfLocks);
+                            deleteKeyAsyncTask.execute((Void) null);
+                        }
+                    });
+                AlertDialog reg = deleteKeyAlertDialog.create();
+                reg.show();
 
             }
         } );
 
-
-
-
         return row;
     }
+
     /*
      * Show AlertDialog with some form elements.
      */
@@ -259,16 +264,16 @@ class CheckUserAsync extends AsyncTask<Void, Void, Boolean> {
 
     Context context;
     private ProgressDialog progressDialog;
-    ArrayList<KeysHashes> userList = new ArrayList<>();
-    private DataBaseHandler dataBaseHandler = new DataBaseHandler();
-    KeysListViewHolder keysListViewHolder;
-    KeysHashes keysHashes;
+    DataBaseHandler dataBaseHandler = new DataBaseHandler();
+    String userName;
+    ListOfLocks listOfLocks;
 
-    public DeleteKeyAsyncTask(Context context , KeysHashes keysHashes,KeysListViewHolder keysListViewHolder) {
 
-        this.context=context;
-        this.keysHashes=keysHashes;
-        this.keysListViewHolder = keysListViewHolder;
+    public DeleteKeyAsyncTask(Context context ,String userName, ListOfLocks listOfLocks) {
+        this.context = context;
+        this.userName = userName;
+        this.listOfLocks = listOfLocks;
+
     }
 
     @Override
@@ -283,11 +288,13 @@ class CheckUserAsync extends AsyncTask<Void, Void, Boolean> {
 
         synchronized (this) {
             try {
-                //   Log.e( "KeyHashesName", "do in background: " + keysHashes.getKeyName() );
-                userList = KeysListActivity.getListOfKeys();
-                dataBaseHandler.removeKey(String.valueOf(keysHashes.keyID),String.valueOf( keysHashes.LockID ));
-                Log.e( "asynctest", "list of keys is size:" + userList.size() );
-
+                Log.e("DELETEKEYASYNC", "do in background: ");
+                ArrayList<String> userId = dataBaseHandler.userExists(userName);
+                Log.e("DELETEKEYASYNC", "do in background: userID " + userId.get(0));
+                if(  userId.size() > 0) {
+                    String userID = userId.get(0);
+                    dataBaseHandler.removeKey(userID, listOfLocks.lockId);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }

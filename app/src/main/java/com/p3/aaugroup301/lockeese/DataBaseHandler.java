@@ -149,7 +149,7 @@ public class DataBaseHandler {
                     public void onFailure(@NonNull Exception e) {
                     }
                 });
-        DocumentReference locksUser = db.collection(LOCKS_COLLECTION).document(lockID).collection(USERS_COLLECTION).document(id);
+        DocumentReference locksUser = db.collection(LOCKS_COLLECTION).document(lockID).collection(USERSOFLOCK_COLLECTION).document(id);
 
         locksUser.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -264,7 +264,7 @@ public class DataBaseHandler {
                                 Log.w("checkUserExists", "print user name " + document.getString("Username") + "=" + inputUsername);
                                 //tOfUsers.add(document.getString("Username"));
                                 try {
-                                    UserExistsBlockingQueue.put(document.getString("Username"));
+                                    UserExistsBlockingQueue.put(document.getId());
                                 } catch (InterruptedException e) {
                                     e.printStackTrace();
                                 }
@@ -295,9 +295,10 @@ public class DataBaseHandler {
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     for (QueryDocumentSnapshot document : task.getResult()) {
-                        Log.w("getUsersBylocks", "print user name " +document.getString("Username") );
-                        if( document.getString("Username") != null )
+                        Log.w("getUsersBylocks", "print user name " +document.getString("Username") +":" + document.getId());
+                        if( document.getString("Username") != null ) {
                             listOfUsers.add(document.getString("Username"));
+                        }
                     }
                 } else {
                     Log.w("getUsers", "Error getting documents.", task.getException());
@@ -308,6 +309,10 @@ public class DataBaseHandler {
         return listOfUsers;
     }
 
+    public String getUserid(String userName) {
+
+        return "";
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void shareKey(String username, String lockID, String lockName, String accessLevel){
