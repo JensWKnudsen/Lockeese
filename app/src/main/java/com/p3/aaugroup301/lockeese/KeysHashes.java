@@ -2,6 +2,8 @@ package com.p3.aaugroup301.lockeese;
 
 import com.google.firebase.Timestamp;
 
+import java.security.PublicKey;
+
 public class KeysHashes {
     String keyName;
     String keyID;
@@ -9,14 +11,16 @@ public class KeysHashes {
     String LockID;
     Integer accessLevel;
     Timestamp expirationDate;
+    PublicKey publicKey;
 
-    public KeysHashes(String keyName, String keyID, String keyHash, String lockID, Integer accessLevel, Timestamp expirationDate) {
+    public KeysHashes(String keyName, String keyID, String keyHash, String lockID, Integer accessLevel, Timestamp expirationDate,PublicKey publicKey) {
         this.keyName = keyName;
         this.keyID = keyID;
         this.keyHash = keyHash;
         this.LockID = lockID;
         this.accessLevel = accessLevel;
         this.expirationDate = expirationDate;
+        this.publicKey = publicKey;
     }
 
     public String getKeyName() {
@@ -67,5 +71,11 @@ public class KeysHashes {
         expirationDate = timer;
     }
 
+    public PublicKey getPublicKey() {
+        return publicKey;
+    }
 
+    public void setPublicKey(PublicKey publicKey) {
+        this.publicKey = publicKey;
+    }
 }

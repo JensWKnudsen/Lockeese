@@ -29,6 +29,8 @@ public class AppDiffieHelman {
     PublicKey AsymmetricPublicKeyPi;
     SecretKeySpec appAesKeySpec;
 
+    /*
+
     public PublicKey AppStart(PublicKey AsymmetricPublicKeyPi) throws NoSuchAlgorithmException {
 
         encryptionHandler = new EncryptionHandler();
@@ -47,6 +49,7 @@ public class AppDiffieHelman {
          * in encoded format.
          * It instantiates a DH public key from the encoded key material.
          */
+    /*
         KeyFactory appKeyFac = KeyFactory.getInstance("DH");
         X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(piDHPubKeyEnc);
 
@@ -57,6 +60,7 @@ public class AppDiffieHelman {
          * It must use the same parameters when it generates its own key
          * pair.
          */
+    /*
         DHParameterSpec dhParamFromPisPubKey = ((DHPublicKey)piDHPubKey).getParams();
 
         KeyPair appDHKeyPair = createDHKeypair(dhParamFromPisPubKey);
@@ -94,6 +98,7 @@ public class AppDiffieHelman {
          * of his version of the DH
          * protocol.
          */
+    /*
         appKeyAgree.doPhase(piDHPubKey, true);
         byte[] piSharedSecret = appKeyAgree.generateSecret();
         appAesKeySpec = new SecretKeySpec(piSharedSecret, 0, 16, "AES");
@@ -137,5 +142,5 @@ public class AppDiffieHelman {
         return "Error".getBytes();
 
     }
-
+    */
 }

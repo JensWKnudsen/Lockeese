@@ -14,6 +14,7 @@ import java.util.Arrays;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.KeyAgreement;
 import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
@@ -141,5 +142,11 @@ public class EncryptionHandler {
         byte[] plaintext = cipher.doFinal(inputText);
 
         return plaintext;
+    }
+
+    public KeyAgreement DHKeyAgreement(KeyPair appDHKpair) throws NoSuchAlgorithmException, InvalidKeyException {
+        KeyAgreement appKeyAgree = KeyAgreement.getInstance("DH");
+        appKeyAgree.init(appDHKpair.getPrivate());
+        return appKeyAgree;
     }
 }

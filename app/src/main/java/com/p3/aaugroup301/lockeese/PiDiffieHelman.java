@@ -25,7 +25,7 @@ import javax.crypto.spec.SecretKeySpec;
 public class PiDiffieHelman {
 
     KeyPair AsymmetricKeyPairPi;
-
+    /*
     public void piStart() throws NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException, BadPaddingException, IllegalBlockSizeException, InvalidKeySpecException, InvalidAlgorithmParameterException {
         AppDiffieHelman appDiffieHelman = new AppDiffieHelman();
 
@@ -55,6 +55,7 @@ public class PiDiffieHelman {
          * Before it can do so, it has to instantiate a DH public key
          * from the app's encoded key material.
          */
+    /*
         KeyFactory piKeyFac = KeyFactory.getInstance("DH");
         X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(AppDHPubKeyEnc);
         PublicKey AppDHPubKey = piKeyFac.generatePublic(x509KeySpec);
@@ -102,6 +103,7 @@ public class PiDiffieHelman {
     /*
      * Pi creates its own DH key pair with 2048-bit key size
      */
+    /*
     public KeyPair createDHKeypair() throws NoSuchAlgorithmException {
         KeyPairGenerator PiKpairGen = KeyPairGenerator.getInstance("DH");
         PiKpairGen.initialize(512);
@@ -114,5 +116,5 @@ public class PiDiffieHelman {
         PiKeyAgree.init(PiDHKpair.getPrivate());
         return PiKeyAgree;
     }
-
+*/
 }

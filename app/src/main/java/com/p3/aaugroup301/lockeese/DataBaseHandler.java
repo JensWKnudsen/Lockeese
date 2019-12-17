@@ -19,8 +19,14 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.security.KeyFactory;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
@@ -49,6 +55,9 @@ public class DataBaseHandler {
     private static final String ACCESS_LEVEL = "Access Level";
     private static final String USERID = "UserID";
     private static final String KEY = "Key";
+    private static final String LOCKPUBLICKEY = "LockPublicKey";
+    private static final String PRIVATEKEY = "PrivateKey";
+    private static final String PUBLICEKEY = "PublicKey";
 
 
     private static ArrayBlockingQueue<String> StringBlockingQueue = new ArrayBlockingQueue<>(1);
@@ -62,6 +71,8 @@ public class DataBaseHandler {
 
     static String currentUserID;
     static String currentUserName;
+    static PrivateKey privateKey;
+    static PublicKey publicKey;
 
     public static String getCurrentUserID() {
         return currentUserID;
@@ -79,12 +90,26 @@ public class DataBaseHandler {
         DataBaseHandler.currentUserName = currentUserName;
     }
 
+    public static PrivateKey getPrivateKey() {
+        return privateKey;
+    }
 
+    public static void setPrivateKey(PrivateKey privateKey) {
+        DataBaseHandler.privateKey = privateKey;
+    }
+
+    public static PublicKey getPublicKey() {
+        return publicKey;
+    }
+
+    public static void setPublicKey(PublicKey publicKey) {
+        DataBaseHandler.publicKey = publicKey;
+    }
 
     //Login
     public String login(String username, String password){
         Log.e("verify user","start");
-        StringBlockingQueue.clear();
+        stringArrayBlockingQueue.clear();
         Query userWithTheUsername = db.collection(USERS_COLLECTION).whereEqualTo(USERNAME, username).whereEqualTo(PASSWORD,password);
 
         userWithTheUsername.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -94,16 +119,24 @@ public class DataBaseHandler {
                 if (querySnapshot.isEmpty()){
                     Log.e("verify user", "A user with this password and username does not exist");
                     try {
-                        StringBlockingQueue.put("");
+                        ArrayList<String> array= new ArrayList<>();
+                        stringArrayBlockingQueue.put(array);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
 
                 }else{
+                    ArrayList<String> array = new ArrayList<>();
                     String id = querySnapshot.getDocuments().get(0).getId();
+                    String privateKey = querySnapshot.getDocuments().get(0).getString(PRIVATEKEY);
+                    String publicKey = querySnapshot.getDocuments().get(0).getString(PUBLICEKEY);
+                    array.add(id);
+                    array.add(privateKey);
+                    array.add(publicKey);
                     Log.e("verify user", "A user with this password and username exists. id: " + id);
                     try {
-                        StringBlockingQueue.put(id);
+
+                        stringArrayBlockingQueue.put(array);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -112,10 +145,27 @@ public class DataBaseHandler {
         });
 
         try {
-            String temp = StringBlockingQueue.take();
-            currentUserID = temp;
+            ArrayList<String> temp = stringArrayBlockingQueue.take();
+            currentUserID = temp.get(0);
             currentUserName = username;
-            return temp;
+
+            try {
+                KeyFactory KeyFac = KeyFactory.getInstance("RSA");
+                byte[] decodedPrivateKey = decodeHexString(temp.get(1));
+                PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(decodedPrivateKey);
+                privateKey = KeyFac.generatePrivate(pkcs8EncodedKeySpec);
+
+                byte[] decodedPublicKey = decodeHexString(temp.get(2));
+                X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(decodedPublicKey);
+                PublicKey AsymmetricPubKey = KeyFac.generatePublic(x509KeySpec);
+                publicKey = AsymmetricPubKey;
+
+            } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+                e.printStackTrace();
+            }
+
+
+            return currentUserID;
         } catch (InterruptedException e) {
             e.printStackTrace();
             return "";
@@ -184,7 +234,27 @@ public class DataBaseHandler {
                         String lockid = document.getString(LOCKID);
                         Integer accessLevel = document.getLong(ACCESS_LEVEL).intValue();
                         Timestamp timestamp = document.getTimestamp(EXPIRATION);
-                        KeysHashes keysHashes = new KeysHashes(name,id,hash,lockid,accessLevel,timestamp);
+                        String publicKey = document.getString(LOCKPUBLICKEY);
+                        Log.e("PublicKey","Key is: " + publicKey);
+                        Log.e("PublicKey","Key is: " + id);
+                        Log.e("PublicKey","Key is: " + timestamp.toString());
+
+
+                        KeyFactory KeyFac = null;
+                        PublicKey AsymmetricPubKey = null;
+                        try {
+                            byte[] decodedPublicKey = decodeHexString(publicKey);
+                            KeyFac = KeyFactory.getInstance("RSA");
+                            X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(decodedPublicKey);
+                            AsymmetricPubKey = KeyFac.generatePublic(x509KeySpec);
+                        } catch (NoSuchAlgorithmException e) {
+                            e.printStackTrace();
+                        } catch (InvalidKeySpecException e) {
+                            e.printStackTrace();
+                        }
+
+
+                        KeysHashes keysHashes = new KeysHashes(name,id,hash,lockid,accessLevel,timestamp,AsymmetricPubKey);
                         listOfKeys.add(keysHashes);
 
                     }
@@ -314,7 +384,6 @@ public class DataBaseHandler {
         return "";
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     public void shareKey(String username, String lockID, String lockName, String accessLevel){
         SharekeyBlockingQueue.clear();
         String userSharedWith;
@@ -347,7 +416,8 @@ public class DataBaseHandler {
             String hashKeyInput = userSharedWith + currentDate + lockID;
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] encodedHash = digest.digest(hashKeyInput.getBytes(StandardCharsets.UTF_8));
-            String encodedString = Base64.getEncoder().encodeToString(encodedHash);
+            //String encodedString = Base64.getEncoder().encodeToString(encodedHash);
+            String encodedString = encodeHexString(encodedHash);
 
             Map<String, Object> lockData = new HashMap<>();
             lockData.put(ACCESS_LEVEL, Integer.parseInt(accessLevel));
@@ -404,6 +474,52 @@ public class DataBaseHandler {
     }
     //delete user from lock (username, lockID)
 
+
+
+    public String encodeHexString(byte[] byteArray) {
+        StringBuffer hexStringBuffer = new StringBuffer();
+        for (int i = 0; i < byteArray.length; i++) {
+            hexStringBuffer.append(byteToHex(byteArray[i]));
+        }
+        return hexStringBuffer.toString();
+    }
+
+
+    public byte[] decodeHexString(String hexString) {
+        if (hexString.length() % 2 == 1) {
+            throw new IllegalArgumentException(
+                    "Invalid hexadecimal String supplied.");
+        }
+
+        byte[] bytes = new byte[hexString.length() / 2];
+        for (int i = 0; i < hexString.length(); i += 2) {
+            bytes[i / 2] = hexToByte(hexString.substring(i, i + 2));
+        }
+        return bytes;
+    }
+
+
+    public byte hexToByte(String hexString) {
+        int firstDigit = toDigit(hexString.charAt(0));
+        int secondDigit = toDigit(hexString.charAt(1));
+        return (byte) ((firstDigit << 4) + secondDigit);
+    }
+
+    private int toDigit(char hexChar) {
+        int digit = Character.digit(hexChar, 16);
+        if(digit == -1) {
+            throw new IllegalArgumentException(
+                    "Invalid Hexadecimal Character: "+ hexChar);
+        }
+        return digit;
+    }
+
+    public String byteToHex(byte num) {
+        char[] hexDigits = new char[2];
+        hexDigits[0] = Character.forDigit((num >> 4) & 0xF, 16);
+        hexDigits[1] = Character.forDigit((num & 0xF), 16);
+        return new String(hexDigits);
+    }
 
 }
 
