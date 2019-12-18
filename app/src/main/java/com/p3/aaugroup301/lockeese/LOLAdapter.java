@@ -34,7 +34,7 @@ public class LOLAdapter extends BaseAdapter {
 
     private Context context;
     public ArrayList<ListOfLocks> locksList;
-    DataBaseHandler dbhandler;
+    DBHandler dbhandler;
 
     public LOLAdapter(Context context, ArrayList<ListOfLocks> locksList){
 
@@ -88,7 +88,7 @@ public class LOLAdapter extends BaseAdapter {
         lockListViewHolder.lockName.setText(listOfLocks.lockName);
         //lockListViewHolder.lockName.setBackgroundColor(Color.GRAY);
         lockListViewHolder.theLockIsSharedWith.setText("The lock is shared with: ");
-        dbhandler = new DataBaseHandler();
+        dbhandler = new DBHandler();
         final ArrayList userList = dbhandler.getUsers(listOfLocks.lockId);
         ArrayList tempUserList = userList;
 
@@ -147,7 +147,7 @@ public class LOLAdapter extends BaseAdapter {
      */
 
     public void alertShareKeyDialog(final Context context, final ListOfLocks lol) {
-        final DataBaseHandler dbhandler = new DataBaseHandler();
+        final DBHandler dbhandler = new DBHandler();
         final LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View alertDialogView = inflater.inflate(R.layout.share_key_alert_dialog,
                 null, false);
@@ -211,7 +211,7 @@ class CheckUserAsync extends AsyncTask<Void, Void, Boolean> {
     String username;
     String accessLevel;
     ListOfLocks lol;
-    DataBaseHandler dbhandler = new DataBaseHandler();
+    DBHandler dbhandler = new DBHandler();
 
     public CheckUserAsync(Context context, String username, String accessLevel, ListOfLocks lol) {
         this.context = context;
@@ -262,7 +262,7 @@ class CheckUserAsync extends AsyncTask<Void, Void, Boolean> {
 
     Context context;
     private ProgressDialog progressDialog;
-    DataBaseHandler dataBaseHandler = new DataBaseHandler();
+    DBHandler DBHandler = new DBHandler();
     String userName;
     ListOfLocks listOfLocks;
 
@@ -287,11 +287,11 @@ class CheckUserAsync extends AsyncTask<Void, Void, Boolean> {
         synchronized (this) {
             try {
                 Log.e("DELETEKEYASYNC", "do in background: ");
-                ArrayList<String> userId = dataBaseHandler.userExists(userName);
+                ArrayList<String> userId = DBHandler.userExists(userName);
                 Log.e("DELETEKEYASYNC", "do in background: userID " + userId.get(0));
                 if(  userId.size() > 0) {
                     String userID = userId.get(0);
-                    dataBaseHandler.removeKey(userID, listOfLocks.lockId);
+                    DBHandler.removeKey(userID, listOfLocks.lockId);
                 }
             } catch (Exception e) {
                 e.printStackTrace();

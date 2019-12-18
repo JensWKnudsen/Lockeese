@@ -36,11 +36,11 @@ import androidx.annotation.NonNull;
 import static android.content.ContentValues.TAG;
 
 /**
- * DataBaseHandler handles all communication with the database
+ * DBHandler handles all communication with the database
  * Final strings are used as references to database collections and fields
  * The information about the logged in user is stored here
  */
-public class DataBaseHandler {
+public class DBHandler {
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();//creates an object/reference of the database "db"
     private static final String USERS_COLLECTION = "Users"; //Name of the user collection in the database
@@ -78,7 +78,7 @@ public class DataBaseHandler {
     }
 
     public static void setCurrentUserID(String currentUserID) {
-        DataBaseHandler.currentUserID = currentUserID;
+        DBHandler.currentUserID = currentUserID;
     }
 
     public static String getCurrentUserName() {
@@ -86,7 +86,7 @@ public class DataBaseHandler {
     }
 
     public static void setCurrentUserName(String currentUserName) {
-        DataBaseHandler.currentUserName = currentUserName;
+        DBHandler.currentUserName = currentUserName;
     }
 
     public static PrivateKey getPrivateKey() {
@@ -94,7 +94,7 @@ public class DataBaseHandler {
     }
 
     public static void setPrivateKey(PrivateKey privateKey) {
-        DataBaseHandler.privateKey = privateKey;
+        DBHandler.privateKey = privateKey;
     }
 
     public static PublicKey getPublicKey() {
@@ -102,7 +102,7 @@ public class DataBaseHandler {
     }
 
     public static void setPublicKey(PublicKey publicKey) {
-        DataBaseHandler.publicKey = publicKey;
+        DBHandler.publicKey = publicKey;
     }
 
     //Login

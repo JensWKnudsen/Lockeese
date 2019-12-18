@@ -94,7 +94,7 @@ public class ListAdapter extends BaseAdapter {
         Context context;
        private ProgressDialog progressDialog;
        ArrayList<KeysHashes> listOfKeys = new ArrayList<>();
-       private DataBaseHandler dataBaseHandler = new DataBaseHandler();
+       private DBHandler DBHandler = new DBHandler();
        KeysListViewHolder keysListViewHolder;
        KeysHashes keysHashes;
 
@@ -119,7 +119,7 @@ public class ListAdapter extends BaseAdapter {
                try {
                 //   Log.e( "KeyHashesName", "do in background: " + keysHashes.getKeyName() );
                   listOfKeys = KeysListActivity.getListOfKeys();
-                           dataBaseHandler.removeKey(String.valueOf(keysHashes.keyID),String.valueOf( keysHashes.LockID ));
+                           DBHandler.removeKey(String.valueOf(keysHashes.keyID),String.valueOf( keysHashes.LockID ));
                    Log.e( "asynctest", "list of keys is size:" + listOfKeys.size() );
 
                } catch (Exception e) {

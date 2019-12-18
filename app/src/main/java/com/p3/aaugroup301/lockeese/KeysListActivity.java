@@ -1,21 +1,15 @@
 package com.p3.aaugroup301.lockeese;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.text.method.KeyListener;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 
-import com.google.firebase.Timestamp;
 import java.util.Date;
 import java.util.ArrayList;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,7 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 public class KeysListActivity extends AppCompatActivity {
 
     Context context;
-    DataBaseHandler dataBaseHandler;
+    DBHandler DBHandler;
     ListView listView;
 
   static   public ArrayList<KeysHashes> getListOfKeys() {
@@ -43,7 +37,7 @@ public class KeysListActivity extends AppCompatActivity {
         super.onCreate( savedInstanceState );
         setContentView( R.layout.activity_keys_list );
         listView = findViewById( R.id.customListView );
-        dataBaseHandler = new DataBaseHandler();
+        DBHandler = new DBHandler();
         Log.e( "SearchLocks", "before GetKeysAsyncTask" );
 
         Button nextScreenButton = findViewById( R.id.nextScreenButton );
@@ -62,8 +56,8 @@ public class KeysListActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                DataBaseHandler.setCurrentUserID( null );
-                DataBaseHandler.setCurrentUserName( null );
+                DBHandler.setCurrentUserID( null );
+                DBHandler.setCurrentUserName( null );
 
                 Context context = view.getContext();
                 Intent intent = new Intent( context, LoginActivity.class );
@@ -92,7 +86,7 @@ public class KeysListActivity extends AppCompatActivity {
         if (currentDate.after( expirationDate )) {
             //delete key
             Log.e( "Expiration", "key is expired" );
-            dataBaseHandler.removeKey( String.valueOf( keysHashes.keyID ), String.valueOf( keysHashes.LockID ) );
+            DBHandler.removeKey( String.valueOf( keysHashes.keyID ), String.valueOf( keysHashes.LockID ) );
         }
 
     }
@@ -103,7 +97,7 @@ public class KeysListActivity extends AppCompatActivity {
         Context context;
         private ProgressDialog progressDialog;
         ArrayList<KeysHashes> listOfKeys = new ArrayList<>();
-        private DataBaseHandler dataBaseHandler = new DataBaseHandler();
+        private DBHandler DBHandler = new DBHandler();
 
         public GetKeysAsyncTask(Context context) {
             this.context = context;
@@ -125,7 +119,7 @@ public class KeysListActivity extends AppCompatActivity {
 
             synchronized (this) {
                 try {
-                    listOfKeys = dataBaseHandler.getKeyHashes();
+                    listOfKeys = DBHandler.getKeyHashes();
                     KeysListActivity.setListOfKeys( listOfKeys );
 
                     Log.e( "asynctest", "list of keys is size:" + listOfKeys.size() );

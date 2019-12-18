@@ -10,7 +10,7 @@ public class GetUsersTask extends AsyncTask<Void, Void, ArrayList<String>> {
 
     ProgressDialog progressDialog;
     private Context context;
-    private DataBaseHandler dbh;
+    private DBHandler dbh;
 
 
     GetUsersTask(){

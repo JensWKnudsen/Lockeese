@@ -1,14 +1,9 @@
 package com.p3.aaugroup301.lockeese;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.solver.ArrayLinkedVariables;
-import androidx.fragment.app.DialogFragment;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -16,8 +11,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -69,7 +62,7 @@ public class ListOfLocksActivity extends AppCompatActivity {
             Context context;
             private ProgressDialog progressDialog;
             ArrayList<ListOfLocks> listOflocksTheUserHas = new ArrayList<>();
-            private DataBaseHandler dataBaseHandler = new DataBaseHandler();
+            private DBHandler DBHandler = new DBHandler();
 
             public GetListOfLocksAsyncTask(Context context) {
                 this.context = context;
@@ -91,7 +84,7 @@ public class ListOfLocksActivity extends AppCompatActivity {
 
                 synchronized (this) {
                     try {
-                        listOflocksTheUserHas = dataBaseHandler.getLocks();
+                        listOflocksTheUserHas = DBHandler.getLocks();
                         Log.e("asynctest", "list of locks is size:" + listOflocksTheUserHas.size());
                     } catch (Exception e) {
                         e.printStackTrace();

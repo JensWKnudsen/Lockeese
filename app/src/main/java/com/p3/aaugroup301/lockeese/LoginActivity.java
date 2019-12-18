@@ -3,7 +3,6 @@ package com.p3.aaugroup301.lockeese;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
-import android.app.Application;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -213,7 +212,7 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher, Com
         private Context context;
         private ProgressDialog progressDialog;
         private String result;
-        DataBaseHandler dataBaseHandler = new DataBaseHandler();
+        DBHandler DBHandler = new DBHandler();
 
       public UserLoginTask(String username, String password, Context context) {
             this.context = context;
@@ -235,9 +234,9 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher, Com
 
             synchronized (this) {
                 try {
-                    Log.e(" trying to login ", "Before DataBaseHandler");
-                    //Calling the login method on the DataBaseHandler
-                    result = dataBaseHandler.login(username,password);
+                    Log.e(" trying to login ", "Before DBHandler");
+                    //Calling the login method on the DBHandler
+                    result = DBHandler.login(username,password);
                     //calling publishProgress method
                     //publishProgress();
                 } catch (Exception e) {

@@ -36,13 +36,13 @@ public class HCEService extends HostApduService {
     EncryptionHandler encryptionHandler;
     SecretKeySpec appAesKeySpec;
     KeysHashes usedKey;
-    DataBaseHandler dataBaseHandler;
+    DBHandler DBHandler;
 
     @Override
     public byte[] processCommandApdu(byte[] bytes, Bundle bundle) {
 
         encryptionHandler = new EncryptionHandler();
-        dataBaseHandler = new DataBaseHandler();
+        DBHandler = new DBHandler();
 
         Log.e("NFC","bytes[] has length: " + bytes.length);
         String AID = new String(Arrays.copyOfRange(bytes,0,12));
@@ -72,7 +72,7 @@ public class HCEService extends HostApduService {
                 for(KeysHashes key: keys){
                     if (Arrays.equals(key.getPublicKey().getEncoded(),piAsymmetricPubKey.getEncoded())){
                         usedKey = key;
-                        return DataBaseHandler.getPublicKey().getEncoded();
+                        return DBHandler.getPublicKey().getEncoded();
                     }
                 }
 
@@ -84,9 +84,9 @@ public class HCEService extends HostApduService {
                 byte[] encryptedDHPublicKeyOfApp = new byte[0];
 
                 try {
-                    Log.e("Decrypting","Message recived: " + dataBaseHandler.encodeHexString(Arrays.copyOfRange(bytes,13,bytes.length)));
+                    Log.e("Decrypting","Message recived: " + DBHandler.encodeHexString(Arrays.copyOfRange(bytes,13,bytes.length)));
 
-                    byte[] piDHPubKeyEnc = encryptionHandler.asymmetricDecrypt(Arrays.copyOfRange(bytes,13,bytes.length),DataBaseHandler.getPrivateKey());
+                    byte[] piDHPubKeyEnc = encryptionHandler.asymmetricDecrypt(Arrays.copyOfRange(bytes,13,bytes.length), DBHandler.getPrivateKey());
                 // after the double encryption the message becomes the same as before it was sent
 
                 /*
