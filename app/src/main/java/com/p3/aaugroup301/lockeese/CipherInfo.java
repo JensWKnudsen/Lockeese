@@ -5,6 +5,9 @@ import java.security.PublicKey;
 
 import javax.crypto.SecretKey;
 
+/**
+ * Contains encryption data.
+ */
 public class CipherInfo {
 
     private SecretKey secretKey;

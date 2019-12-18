@@ -3,7 +3,6 @@ package com.p3.aaugroup301.lockeese;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import java.util.ArrayList;
 

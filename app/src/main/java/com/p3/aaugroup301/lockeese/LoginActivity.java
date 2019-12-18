@@ -253,9 +253,6 @@ public class LoginActivity extends AppCompatActivity implements TextWatcher, Com
                 progressDialog.setMessage(result);
                 progressDialog.dismiss();
                 if(!result.equals("")){
-                    //Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show();
-                    //Controller.goToMainActivity(context);
-                    //context.startActivity(new Intent(context, Beam.class));
                     context.startActivity(new Intent(context, KeysListActivity.class));
                 }
                 else { AlertDialog.Builder login = new AlertDialog.Builder(context);

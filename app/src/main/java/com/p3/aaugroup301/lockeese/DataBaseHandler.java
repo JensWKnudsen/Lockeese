@@ -1,7 +1,6 @@
 package com.p3.aaugroup301.lockeese;
 
 
-import android.os.Build;
 import android.util.Log;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -18,7 +17,6 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.nio.charset.StandardCharsets;
-import java.security.Key;
 import java.security.KeyFactory;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -28,17 +26,20 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 
 import static android.content.ContentValues.TAG;
 
+/**
+ * DataBaseHandler handles all communication with the database
+ * Final strings are used as references to database collections and fields
+ * The information about the logged in user is stored here
+ */
 public class DataBaseHandler {
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();//creates an object/reference of the database "db"
@@ -60,19 +61,17 @@ public class DataBaseHandler {
     private static final String PUBLICEKEY = "PublicKey";
 
 
-    private static ArrayBlockingQueue<String> StringBlockingQueue = new ArrayBlockingQueue<>(1);
     private static ArrayBlockingQueue<ArrayList<String>> stringArrayBlockingQueue = new ArrayBlockingQueue<>(1);
-    private static ArrayBlockingQueue<ArrayList<ArrayList>> ArrayArrayBlockingQueue = new ArrayBlockingQueue<>(1);
     private static ArrayBlockingQueue<ArrayList<KeysHashes>> ArrayHashesBlockingQueue = new ArrayBlockingQueue<>(1);
     private static ArrayBlockingQueue<ArrayList<ListOfLocks>> ArrayListOfLocksBlockingQueue = new ArrayBlockingQueue<>(1);
     private static ArrayBlockingQueue<String> UserExistsBlockingQueue = new ArrayBlockingQueue<>(1);
     private static ArrayBlockingQueue<String> SharekeyBlockingQueue = new ArrayBlockingQueue<>(1);
 
 
-    static String currentUserID;
-    static String currentUserName;
-    static PrivateKey privateKey;
-    static PublicKey publicKey;
+    private static String currentUserID;
+    private static String currentUserName;
+    private static PrivateKey privateKey;
+    private static PublicKey publicKey;
 
     public static String getCurrentUserID() {
         return currentUserID;
@@ -107,7 +106,7 @@ public class DataBaseHandler {
     }
 
     //Login
-    public String login(String username, String password){
+    String login(String username, String password){
         Log.e("verify user","start");
         stringArrayBlockingQueue.clear();
         Query userWithTheUsername = db.collection(USERS_COLLECTION).whereEqualTo(USERNAME, username).whereEqualTo(PASSWORD,password);
@@ -186,7 +185,7 @@ public class DataBaseHandler {
 
 
     // remove key
-    public void removeKey(String id,String lockID){
+    void removeKey(String id, String lockID){
         DocumentReference usersKeys = db.collection(USERS_COLLECTION).document(currentUserID).collection(KEYS_COLLECTION).document(id);
 
         usersKeys.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -216,7 +215,7 @@ public class DataBaseHandler {
 
 
     // get keys     time
-    public ArrayList<KeysHashes> getKeyHashes(){
+    ArrayList<KeysHashes> getKeyHashes(){
         ArrayHashesBlockingQueue.clear();
         Query userWithTheUsername = db.collection(USERS_COLLECTION).document(currentUserID).collection(KEYS_COLLECTION);
         ArrayList<KeysHashes> listOfKeys = new ArrayList<>();
@@ -247,9 +246,7 @@ public class DataBaseHandler {
                             KeyFac = KeyFactory.getInstance("RSA");
                             X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(decodedPublicKey);
                             AsymmetricPubKey = KeyFac.generatePublic(x509KeySpec);
-                        } catch (NoSuchAlgorithmException e) {
-                            e.printStackTrace();
-                        } catch (InvalidKeySpecException e) {
+                        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
                             e.printStackTrace();
                         }
 
@@ -278,7 +275,7 @@ public class DataBaseHandler {
 
     }
 
-    public ArrayList<String> getUsers() {
+    ArrayList<String> getUsers() {
         Query allUsers = db.collection(USERS_COLLECTION);
         final ArrayList<String> listOfUsers = new ArrayList<>();
         allUsers.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -298,28 +295,7 @@ public class DataBaseHandler {
         return listOfUsers;
     }
 
-    public ArrayList<String> userExists(final String inputUsername) {
-//        Query userExistsQuery = db.collection(USERS_COLLECTION);
-//        final ArrayList<String> exists = new ArrayList<>();
-//
-//        userExistsQuery.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//            @Override
-//            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                if (task.isSuccessful()) {
-//                    for (QueryDocumentSnapshot document : task.getResult()) {
-//                        String name = document.getString("Username");
-//                        if (name.equalsIgnoreCase(inputUsername)) {
-//                            Log.w("checkUserExists", "print user name " + document.getString("Username") + "=" + inputUsername);
-//                            exists.add(document.getString("Username"));
-//                        }
-//                    }
-//                }
-//                else {
-//                    Log.w("User exists", "Error getting documents.", task.getException());
-//                }
-//            }
-//        });
-//        return exists;
+    ArrayList<String> userExists(final String inputUsername) {
 
         ArrayList<String> listOfUsers = new ArrayList<>();
         UserExistsBlockingQueue.clear();
@@ -348,6 +324,7 @@ public class DataBaseHandler {
         try {
             listOfUsers.add(UserExistsBlockingQueue.take());
         }catch(InterruptedException e) {
+            e.printStackTrace();
         }
 
         return listOfUsers;
@@ -355,7 +332,7 @@ public class DataBaseHandler {
     }
 
 
-    public ArrayList<String> getUsers(String LockID) {
+    ArrayList<String> getUsers(String LockID) {
         Log.w("getUsersBylocks", "Checking in new get users method" +LockID);
 
         Query allUsersLocks = db.collection(LOCKS_COLLECTION).document(LockID).collection(USERSOFLOCK_COLLECTION);
@@ -379,12 +356,8 @@ public class DataBaseHandler {
         return listOfUsers;
     }
 
-    public String getUserid(String userName) {
 
-        return "";
-    }
-
-    public void shareKey(String username, String lockID, String lockName, String accessLevel){
+    void shareKey(String username, String lockID, String lockName, String accessLevel){
         SharekeyBlockingQueue.clear();
         String userSharedWith;
 
@@ -444,7 +417,7 @@ public class DataBaseHandler {
     }
 
     //get locks lockname listOfUsersOnTheLock timeRemaining
-    public ArrayList<ListOfLocks> getLocks() {
+    ArrayList<ListOfLocks> getLocks() {
         ArrayListOfLocksBlockingQueue.clear();
         final ArrayList<ListOfLocks> listOfIDs = new ArrayList<>();
 
@@ -476,7 +449,7 @@ public class DataBaseHandler {
 
 
 
-    public String encodeHexString(byte[] byteArray) {
+    String encodeHexString(byte[] byteArray) {
         StringBuffer hexStringBuffer = new StringBuffer();
         for (int i = 0; i < byteArray.length; i++) {
             hexStringBuffer.append(byteToHex(byteArray[i]));
@@ -485,7 +458,7 @@ public class DataBaseHandler {
     }
 
 
-    public byte[] decodeHexString(String hexString) {
+    private byte[] decodeHexString(String hexString) {
         if (hexString.length() % 2 == 1) {
             throw new IllegalArgumentException(
                     "Invalid hexadecimal String supplied.");
@@ -499,7 +472,7 @@ public class DataBaseHandler {
     }
 
 
-    public byte hexToByte(String hexString) {
+    private byte hexToByte(String hexString) {
         int firstDigit = toDigit(hexString.charAt(0));
         int secondDigit = toDigit(hexString.charAt(1));
         return (byte) ((firstDigit << 4) + secondDigit);
@@ -514,7 +487,7 @@ public class DataBaseHandler {
         return digit;
     }
 
-    public String byteToHex(byte num) {
+    private String byteToHex(byte num) {
         char[] hexDigits = new char[2];
         hexDigits[0] = Character.forDigit((num >> 4) & 0xF, 16);
         hexDigits[1] = Character.forDigit((num & 0xF), 16);

@@ -57,22 +57,6 @@ public class ListOfLocksActivity extends AppCompatActivity {
         });
     }
 
-       /**
-
-
-
-        setContentView(R.layout.activity_list_of_locks);
-        listOfSharedKeys = findViewById(R.id.spinnerListOfGivenKeys);
-
-        ArrayList<String> listOfUsersWithKey = dbh.getUsers();
-
-        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item,
-                listOfUsersWithKey);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        listOfSharedKeys.setAdapter(adapter);
-
-        */
-
 
         /**
          * Represents an asynchronous changing activity task used to fetch the data

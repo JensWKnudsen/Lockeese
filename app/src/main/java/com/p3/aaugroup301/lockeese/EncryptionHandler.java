@@ -19,12 +19,12 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 
-/**Class KeyGenerator generates Keys on the phone of the user and encrypts it
- *  with AES 256 encryption
-  */
 
+/**
+ * EncryptionHandler generates RSA and AES keys
+ * Also used to encrypt and decrypt messages with RSA or AES encryption.
+ */
 
 public class EncryptionHandler {
 
