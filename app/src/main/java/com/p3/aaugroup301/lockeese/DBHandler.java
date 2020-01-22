@@ -59,7 +59,7 @@ public class DBHandler {
     private static final String LOCKPUBLICKEY = "LockPublicKey";
     private static final String PRIVATEKEY = "PrivateKey";
     private static final String PUBLICEKEY = "PublicKey";
-
+    private static final String USERSPUBLICEKEY = "UserPublicKey";
 
     private static ArrayBlockingQueue<ArrayList<String>> stringArrayBlockingQueue = new ArrayBlockingQueue<>(1);
     private static ArrayBlockingQueue<ArrayList<KeysHashes>> ArrayHashesBlockingQueue = new ArrayBlockingQueue<>(1);
@@ -391,14 +391,16 @@ public class DBHandler {
             byte[] encodedHash = digest.digest(hashKeyInput.getBytes(StandardCharsets.UTF_8));
             //String encodedString = Base64.getEncoder().encodeToString(encodedHash);
             String encodedString = encodeHexString(encodedHash);
-
+Log.e ("GOD; HELP US!", "Before Map");
             Map<String, Object> lockData = new HashMap<>();
             lockData.put(ACCESS_LEVEL, Integer.parseInt(accessLevel));
+            lockData.put(EXPIRATION,Timestamp.now());
             lockData.put(KEY,encodedString);
             lockData.put(USERID, userSharedWith);
+            lockData.put(USERSPUBLICEKEY, getUserPublicKey(userSharedWith));
             lockData.put(USERNAME, username);
             db.collection(LOCKS_COLLECTION).document(lockID).collection(USERSOFLOCK_COLLECTION).document(userSharedWith).set(lockData);
-
+            Log.e ("GOD; HELP US!", "After Map");
 
 
 
@@ -406,6 +408,7 @@ public class DBHandler {
             Map<String, Object> keyData = new HashMap<>();
             keyData.put(NAME_OF_KEY, lockName + " (" + currentUserName + ")");
             keyData.put(LOCKID, lockID);
+            keyData.put(LOCKPUBLICKEY, getLockPublicKey(lockID));
             keyData.put(ACCESS_LEVEL, Integer.parseInt(accessLevel));
             keyData.put(EXPIRATION, Timestamp.now());
             keyData.put(HASH, encodedString);
@@ -414,6 +417,74 @@ public class DBHandler {
         } catch (InterruptedException | NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
+    }
+
+    String getLockPublicKey(String lockID){
+        Log.e ("GOD; HELP US!", "getLockPublcKey methof Map");
+        String lockPublicKey ="";
+        UserExistsBlockingQueue.clear();
+        db.collection(LOCKS_COLLECTION)
+                .whereEqualTo(LOCKID, lockID)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                //tOfUsers.add(document.getString("Username"));
+                                try {
+                                    UserExistsBlockingQueue.put(document.getString(PUBLICEKEY));
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
+
+        try {
+            lockPublicKey = UserExistsBlockingQueue.take();
+        }catch(InterruptedException e) {
+            e.printStackTrace();
+        }
+        return lockPublicKey;
+    }
+
+    String getUserPublicKey(String userID){
+        Log.e ("GOD; HELP US!", "inside getUserPublicKey Map");
+        String usersPublicKey ="";
+        ArrayList<String> listOfUsers = new ArrayList<>();
+        UserExistsBlockingQueue.clear();
+        db.collection(USERS_COLLECTION)
+                .whereEqualTo(USERID, userID)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                //tOfUsers.add(document.getString("Username"));
+                                try {
+                                    Log.e ("GOD; HELP US!", "inside getUserPublicKey  INSIDE TRY ");
+                                    UserExistsBlockingQueue.put(document.getString(PUBLICEKEY));
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        } else {
+                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        }
+                    }
+                });
+
+        try {
+            usersPublicKey = UserExistsBlockingQueue.take();
+        }catch(InterruptedException e) {
+            e.printStackTrace();
+        }
+        return usersPublicKey;
     }
 
     //get locks lockname listOfUsersOnTheLock timeRemaining

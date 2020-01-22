@@ -41,7 +41,12 @@ public class HCEService extends HostApduService {
     DBHandler DBHandler;
     byte[] part1;
     byte[] part2;
-
+    byte[] encryptedDHPublicKeyOfApp = new byte[0];
+    byte[] diffieHellmankeyPart1;
+    byte[] diffieHellmankeyPart2;
+    byte[] finalArrayDHPublicKey;
+    byte[] responseDHKeyPart1;
+    byte[] responseDHKeyPart2;
 
     @Override
     public byte[] processCommandApdu(byte[] bytes, Bundle bundle) {
@@ -49,64 +54,30 @@ public class HCEService extends HostApduService {
         encryptionHandler = new EncryptionHandler();
         DBHandler = new DBHandler();
 
-        Log.e("NFC","bytes[] has length: " + bytes.length);
         String AID = new String(Arrays.copyOfRange(bytes,0,12));
-        Log.e("NFC","AID: " + AID);
-        Log.e("NFC","0. byte is " +new String(Arrays.copyOfRange(bytes,0,1)) );
-        Log.e("NFC","1. byte is " +new String(Arrays.copyOfRange(bytes,1,2)) );
-        Log.e("NFC","2. byte is " +new String(Arrays.copyOfRange(bytes,2,3)) );
-        Log.e("NFC","3. byte is " +new String(Arrays.copyOfRange(bytes,3,4)) );
-        Log.e("NFC","4. byte is " +new String(Arrays.copyOfRange(bytes,4,5)) );
-        Log.e("NFC","5. byte is " +new String(Arrays.copyOfRange(bytes,5,6)) );
-        Log.e("NFC","6. byte is " +new String(Arrays.copyOfRange(bytes,6,7)) );
-        Log.e("NFC","7. byte is " +new String(Arrays.copyOfRange(bytes,7,8)) );
-        Log.e("NFC","8. byte is " +new String(Arrays.copyOfRange(bytes,8,9)) );
-        Log.e("NFC","9. byte is " +new String(Arrays.copyOfRange(bytes,9,10)) );
-        Log.e("NFC","10. byte is " +new String(Arrays.copyOfRange(bytes,10,11)) );
-        Log.e("NFC","11. byte is " +new String(Arrays.copyOfRange(bytes,11,12)) );
-        Log.e("NFC","12. byte is " +new String(Arrays.copyOfRange(bytes,12,13)) );
-
         String stage = new String(Arrays.copyOfRange(bytes,12,13));
-        Log.e("NFC","stage is: " + stage);
         String messagePart = new String(Arrays.copyOfRange(bytes,13,bytes.length));
-        Log.e("NFC","extra info is: " + messagePart);
-      byte[] msgPartBytesArray = Arrays.copyOfRange(bytes,13,bytes.length);
-      Log.e("NFC", "size of the array :" + msgPartBytesArray.length);
+        byte[] msgPartBytesArray = Arrays.copyOfRange(bytes,13,bytes.length);
+        byte[] ownPublicKey = DBHandler.getPublicKey().getEncoded();
 
 
-
-
+        Log.e("NFC", "Entering the stage " + stage);
         switch(stage)
         {
             case"0" :
-                Log.e("NFC", "case 0: ");
                 part1 = Arrays.copyOfRange(bytes,13,bytes.length);
-
-            return part1;
+                byte[] ownKeyPart1 = Arrays.copyOfRange(ownPublicKey, 0,200);
+            return ownKeyPart1;
 
             case "1" :
-                Log.e("NFC", "case 1: ");
                 part2 = Arrays.copyOfRange(bytes,13,bytes.length);
 
-               // byte[] finalArrayPublicKey = new byte[part1.length + part2.length];
                byte[] finalArrayPublicKey = ArrayUtils.concatByteArrays(part1,part2);
-                Log.e("NFC", "size of the part1 array after concat is : " + part1.length);
-                Log.e("NFC", "size of the part2 array after concat is : " + part2.length);
-
-               Log.e("NFC", "size of the final array after concat is : " + finalArrayPublicKey.length);
-
-                Log.e("NFC", "before the try: ");
                 try {
-                    Log.e("NFC", "inside the try: ");
                     KeyFactory KeyFac = KeyFactory.getInstance("RSA");
-                    Log.e("NFC", "AFTER KeyFactory.getInstance: ");
-                    //X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(Arrays.copyOfRange(bytes,13,bytes.length));
-                   // X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(msgPartBytesArray);
                     X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(finalArrayPublicKey);
-                    Log.e("NFC", "after KeySpec " + x509KeySpec);
                     piAsymmetricPubKey = KeyFac.generatePublic(x509KeySpec);
 
-                    //Log.e("NFC", "if the key is not null: " + piAsymmetricPubKey);
                 } catch (NoSuchAlgorithmException e) {
                     e.printStackTrace();
                 } catch (InvalidKeySpecException e) {
@@ -118,7 +89,10 @@ public class HCEService extends HostApduService {
                     if (Arrays.equals(key.getPublicKey().getEncoded(),
                             piAsymmetricPubKey.getEncoded())){
                         usedKey = key;
-                        return DBHandler.getPublicKey().getEncoded();
+                        byte[] ownPublicKeyPart2 = Arrays.copyOfRange(ownPublicKey, 200, ownPublicKey.length);
+
+                        return ownPublicKeyPart2;
+
                     }
                 }
 
@@ -126,13 +100,22 @@ public class HCEService extends HostApduService {
                 return "stage 1 failed".getBytes();
 
 
-            case "2" :
-                byte[] encryptedDHPublicKeyOfApp = new byte[0];
+            case"2":
+
+                diffieHellmankeyPart1 = Arrays.copyOfRange(bytes,13, bytes.length);
+
+                return diffieHellmankeyPart1;
+
+
+            case "3" :
+
+                        diffieHellmankeyPart2 = Arrays.copyOfRange(bytes,13, bytes.length);
+
+               finalArrayDHPublicKey = ArrayUtils.concatByteArrays(diffieHellmankeyPart1,diffieHellmankeyPart2);
 
                 try {
-                    Log.e("Decrypting","Message recived: " + DBHandler.encodeHexString(Arrays.copyOfRange(bytes,13,bytes.length)));
 
-                    byte[] piDHPubKeyEnc = encryptionHandler.asymmetricDecrypt(Arrays.copyOfRange(bytes,13,bytes.length), DBHandler.getPrivateKey());
+                    byte[] piDHPubKeyEnc = encryptionHandler.asymmetricDecrypt(finalArrayDHPublicKey, DBHandler.getPrivateKey());
                 // after the double encryption the message becomes the same as before it was sent
 
                 /*
@@ -145,7 +128,6 @@ public class HCEService extends HostApduService {
                     KeyFactory appKeyFac = KeyFactory.getInstance("DH");
                     X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(piDHPubKeyEnc);
                     PublicKey piDHPubKey = appKeyFac.generatePublic(x509KeySpec);
-
                 /*
                  * The App gets the DH parameters associated with Pi's public key.
                  * It must use the same parameters when it generates its own key
@@ -163,15 +145,22 @@ public class HCEService extends HostApduService {
 
                     //This should happen after the return
                     createSharedSecretKey(piDHPubKey,appKeyAgree);
-                    Log.e("Stage 2","Got to the end");
+
+
+                   responseDHKeyPart1 = Arrays.copyOfRange(encryptedDHPublicKeyOfApp, 0, 200);
 
                 } catch (NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException | InvalidKeyException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | InvalidKeySpecException e) {
                     e.printStackTrace();
                 }
-                return encryptedDHPublicKeyOfApp;
+
+                return responseDHKeyPart1;
 
 
-            case "3" :
+            case "4" :
+                responseDHKeyPart2 = Arrays.copyOfRange(encryptedDHPublicKeyOfApp, 200, encryptedDHPublicKeyOfApp.length);
+                return  responseDHKeyPart2;
+
+            case "5" :
                 try {
                     byte[] ivLentgh = Arrays.copyOfRange(Arrays.copyOfRange(bytes,13,bytes.length),0,8);
 
@@ -201,7 +190,7 @@ public class HCEService extends HostApduService {
                         System.arraycopy(requestMessageCipherInfo.getIv(), 0, messageToPi, 8, requestMessageCipherInfo.getIv().length);
 
                         System.arraycopy(requestMessageCipherInfo.getBytes(), 0, messageToPi, 8 + requestMessageCipherInfo.getIv().length, requestMessageCipherInfo.getBytes().length);
-
+                        Log.e("NFC", "CONGRATULATIONS, WE HAVE MADE IT!!!");
                         return messageToPi;
                     }
                 } catch (NoSuchAlgorithmException | InvalidKeyException | InvalidAlgorithmParameterException | NoSuchPaddingException | BadPaddingException | IllegalBlockSizeException e) {
