@@ -66,7 +66,8 @@ public class DBHandler {
     private static ArrayBlockingQueue<ArrayList<ListOfLocks>> ArrayListOfLocksBlockingQueue = new ArrayBlockingQueue<>(1);
     private static ArrayBlockingQueue<String> UserExistsBlockingQueue = new ArrayBlockingQueue<>(1);
     private static ArrayBlockingQueue<String> SharekeyBlockingQueue = new ArrayBlockingQueue<>(1);
-
+    private static ArrayBlockingQueue<String> userPublicKeyBlockingQueue = new ArrayBlockingQueue<>(1);
+    private static ArrayBlockingQueue<String> lockPublicKeyBlockingQueue = new ArrayBlockingQueue<>(1);
 
     private static String currentUserID;
     private static String currentUserName;
@@ -145,6 +146,7 @@ public class DBHandler {
 
         try {
             ArrayList<String> temp = stringArrayBlockingQueue.take();
+            Log.e("login","user id is: "+temp.get(0));
             currentUserID = temp.get(0);
             currentUserName = username;
 
@@ -157,9 +159,14 @@ public class DBHandler {
                 byte[] decodedPublicKey = decodeHexString(temp.get(2));
                 X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(decodedPublicKey);
                 PublicKey AsymmetricPubKey = KeyFac.generatePublic(x509KeySpec);
+                Log.e("Login", "public key spec gotten: " +x509KeySpec);
                 publicKey = AsymmetricPubKey;
+                Log.e("Login", "public succesfully gotten: " +publicKey);
 
-            } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            }catch (InvalidKeySpecException e) {
+                Log.e("Login", "invalid key spec");
                 e.printStackTrace();
             }
 
@@ -420,71 +427,67 @@ Log.e ("GOD; HELP US!", "Before Map");
     }
 
     String getLockPublicKey(String lockID){
-        Log.e ("GOD; HELP US!", "getLockPublcKey methof Map");
-        String lockPublicKey ="";
-        UserExistsBlockingQueue.clear();
-        db.collection(LOCKS_COLLECTION)
-                .whereEqualTo(LOCKID, lockID)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                //tOfUsers.add(document.getString("Username"));
-                                try {
-                                    UserExistsBlockingQueue.put(document.getString(PUBLICEKEY));
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        } else {
-                            Log.d(TAG, "Error getting documents: ", task.getException());
+        Log.e ("GOD; HELP US!", "inside getLockPublicKey Map");
+        lockPublicKeyBlockingQueue.clear();
+        DocumentReference docRef = db.collection(LOCKS_COLLECTION).document(lockID);
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Log.d(TAG, "DocumentSnapshot data: " + document.getString(PUBLICEKEY));
+                        try {
+                            lockPublicKeyBlockingQueue.put(document.getString(PUBLICEKEY));
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
+                    } else {
+                        Log.d(TAG, "No such document");
                     }
-                });
-
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
         try {
-            lockPublicKey = UserExistsBlockingQueue.take();
-        }catch(InterruptedException e) {
+            return lockPublicKeyBlockingQueue.take();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return lockPublicKey;
+        return null;
     }
 
     String getUserPublicKey(String userID){
         Log.e ("GOD; HELP US!", "inside getUserPublicKey Map");
-        String usersPublicKey ="";
-        ArrayList<String> listOfUsers = new ArrayList<>();
-        UserExistsBlockingQueue.clear();
-        db.collection(USERS_COLLECTION)
-                .whereEqualTo(USERID, userID)
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                //tOfUsers.add(document.getString("Username"));
-                                try {
-                                    Log.e ("GOD; HELP US!", "inside getUserPublicKey  INSIDE TRY ");
-                                    UserExistsBlockingQueue.put(document.getString(PUBLICEKEY));
-                                } catch (InterruptedException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        } else {
-                            Log.d(TAG, "Error getting documents: ", task.getException());
+        userPublicKeyBlockingQueue.clear();
+        DocumentReference docRef = db.collection(USERS_COLLECTION).document(userID);
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Log.d(TAG, "DocumentSnapshot data: " + document.getString(PUBLICEKEY));
+                        try {
+                            userPublicKeyBlockingQueue.put(document.getString(PUBLICEKEY));
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
+                    } else {
+                        Log.d(TAG, "No such document");
                     }
-                });
-
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
         try {
-            usersPublicKey = UserExistsBlockingQueue.take();
-        }catch(InterruptedException e) {
+            return userPublicKeyBlockingQueue.take();
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return usersPublicKey;
+        return null;
     }
 
     //get locks lockname listOfUsersOnTheLock timeRemaining
@@ -520,7 +523,7 @@ Log.e ("GOD; HELP US!", "Before Map");
 
 
 
-    String encodeHexString(byte[] byteArray) {
+    static String encodeHexString(byte[] byteArray) {
         StringBuffer hexStringBuffer = new StringBuffer();
         for (int i = 0; i < byteArray.length; i++) {
             hexStringBuffer.append(byteToHex(byteArray[i]));
@@ -529,7 +532,7 @@ Log.e ("GOD; HELP US!", "Before Map");
     }
 
 
-    private byte[] decodeHexString(String hexString) {
+    static private byte[] decodeHexString(String hexString) {
         if (hexString.length() % 2 == 1) {
             throw new IllegalArgumentException(
                     "Invalid hexadecimal String supplied.");
@@ -543,13 +546,13 @@ Log.e ("GOD; HELP US!", "Before Map");
     }
 
 
-    private byte hexToByte(String hexString) {
+    static private byte hexToByte(String hexString) {
         int firstDigit = toDigit(hexString.charAt(0));
         int secondDigit = toDigit(hexString.charAt(1));
         return (byte) ((firstDigit << 4) + secondDigit);
     }
 
-    private int toDigit(char hexChar) {
+    static private int toDigit(char hexChar) {
         int digit = Character.digit(hexChar, 16);
         if(digit == -1) {
             throw new IllegalArgumentException(
@@ -558,7 +561,7 @@ Log.e ("GOD; HELP US!", "Before Map");
         return digit;
     }
 
-    private String byteToHex(byte num) {
+    static private String byteToHex(byte num) {
         char[] hexDigits = new char[2];
         hexDigits[0] = Character.forDigit((num >> 4) & 0xF, 16);
         hexDigits[1] = Character.forDigit((num & 0xF), 16);
