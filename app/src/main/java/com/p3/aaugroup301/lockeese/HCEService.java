@@ -3,6 +3,7 @@ package com.p3.aaugroup301.lockeese;
 import android.nfc.cardemulation.HostApduService;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.common.util.ArrayUtils;
 
@@ -47,6 +48,7 @@ public class HCEService extends HostApduService {
     byte[] finalArrayDHPublicKey;
     byte[] responseDHKeyPart1;
     byte[] responseDHKeyPart2;
+    int duration = Toast.LENGTH_LONG;
 
     @Override
     public byte[] processCommandApdu(byte[] bytes, Bundle bundle) {
@@ -196,6 +198,15 @@ public class HCEService extends HostApduService {
                 } catch (NoSuchAlgorithmException | InvalidKeyException | InvalidAlgorithmParameterException | NoSuchPaddingException | BadPaddingException | IllegalBlockSizeException e) {
                     e.printStackTrace();
                 }
+
+            case "6":
+                Toast.makeText(getApplicationContext(), "The door is unlocked", duration).show();
+                return null;
+
+            case "7" :
+                Toast.makeText(getApplicationContext(), "Wrong key please request access", duration).show();
+                return null;
+
 
         }
 

@@ -401,7 +401,7 @@ public class DBHandler {
 Log.e ("GOD; HELP US!", "Before Map");
             Map<String, Object> lockData = new HashMap<>();
             lockData.put(ACCESS_LEVEL, Integer.parseInt(accessLevel));
-            lockData.put(EXPIRATION,Timestamp.now());
+            lockData.put(EXPIRATION,new Timestamp(Timestamp.now().getSeconds() + 500,0 ));
             lockData.put(KEY,encodedString);
             lockData.put(USERID, userSharedWith);
             lockData.put(USERSPUBLICEKEY, getUserPublicKey(userSharedWith));
@@ -417,7 +417,7 @@ Log.e ("GOD; HELP US!", "Before Map");
             keyData.put(LOCKID, lockID);
             keyData.put(LOCKPUBLICKEY, getLockPublicKey(lockID));
             keyData.put(ACCESS_LEVEL, Integer.parseInt(accessLevel));
-            keyData.put(EXPIRATION, Timestamp.now());
+            keyData.put(EXPIRATION, new Timestamp(Timestamp.now().getSeconds() + 180,0 ));
             keyData.put(HASH, encodedString);
             db.collection(USERS_COLLECTION).document(userSharedWith).collection(KEYS_COLLECTION).add(keyData);
 
